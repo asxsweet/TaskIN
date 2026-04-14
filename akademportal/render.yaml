@@ -5,7 +5,7 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    buildCommand: npm install --legacy-peer-deps && npm run db:generate && npm run build
+    buildCommand: npm install --legacy-peer-deps --include=dev && npm run db:generate && npm run build
     startCommand: npm run start
     healthCheckPath: /
     autoDeploy: true
