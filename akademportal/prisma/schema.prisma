@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  password     String
+  role         Role           @default(STUDENT)
+  facultyId    String
+  faculty      Faculty        @relation(fields: [facultyId], references: [id])
+  departmentId String?
+  department   Department?    @relation(fields: [departmentId], references: [id])
+  avatar       String?
+  position     String?
+  phone        String?
+  employeeId   String?
+
+  approvalStatus ApprovalStatus @default(PENDING)
+  approvalNote   String?
+  approvedById   String?        @map("approvedBy")
+  approver       User?          @relation("UserApprovalActor", fields: [approvedById], references: [id])
+  approvedUsers  User[]         @relation("UserApprovalActor")
+  approvedAt     DateTime?
+
+  works        Work[]         @relation("AuthorWorks")
+  supervised   Work[]         @relation("SupervisorWorks")
+  reviews      Review[]
+  reviewHelpful ReviewHelpful[]
+  bookmarks    Bookmark[]
+  downloads    Download[]
+  notifications Notification[]
+  createdAt    DateTime       @default(now())
+}
+
+model Work {
+  id               String     @id @default(cuid())
+  title            String
+  abstract         String     @db.Text
+  type             WorkType
+  year             Int
+  language         Language
+  filePath         String
+  fileSize         Int
+  pageCount        Int?
+  status           WorkStatus @default(PENDING)
+  plagiarismScore  Float?
+  authorId         String
+  author           User       @relation("AuthorWorks", fields: [authorId], references: [id])
+  supervisorId     String?
+  supervisor       User?      @relation("SupervisorWorks", fields: [supervisorId], references: [id])
+  departmentId     String
+  department       Department @relation(fields: [departmentId], references: [id])
+  keywords         Keyword[]
+  reviews          Review[]
+  downloads        Download[]
+  bookmarks        Bookmark[]
+  viewCount        Int        @default(0)
+  deletedAt        DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  workId       String
+  work         Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  reviewerId   String
+  reviewer     User     @relation(fields: [reviewerId], references: [id])
+  relevance    Float
+  methodology  Float
+  formatting   Float
+  conclusion   Float
+  overallScore Float
+  strengths    String   @db.Text
+  suggestions  String   @db.Text
+  comment      String   @db.Text
+  decision     Decision
+  returnReason String?
+  helpfulCount Int      @default(0)
+  helpfulMarks ReviewHelpful[]
+  createdAt    DateTime @default(now())
+}
+
+model ReviewHelpful {
+  id        String @id @default(cuid())
+  userId    String
+  reviewId  String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+}
+
+model Faculty {
+  id           String       @id @default(cuid())
+  name         String
+  departments  Department[]
+  users        User[]
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  facultyId String
+  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  works     Work[]
+  users     User[]
+}
+
+model Keyword {
+  id    String @id @default(cuid())
+  name  String
+  works Work[]
+}
+
+model Bookmark {
+  id     String @id @default(cuid())
+  userId String
+  workId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work   Work   @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workId])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String
+  workId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work      Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?  @db.Text
+  link      String?
+  read      Boolean  @default(false)
+  metadata  String?  @db.Text
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id             String   @id
+  siteName       String   @default("Task IN")
+  tagline        String?  @db.Text
+  logoUrl        String?
+  emailFrom      String?  @default("noreply@taskin.kz")
+  contactEmail   String
+  contactPhone   String
+  contactAddress String   @db.Text
+  socialLinks    String   @db.Text
+  emailTemplates String?  @db.Text
+  updatedAt      DateTime @updatedAt
+}
+
+enum Role {
+  STUDENT
+  SUPERVISOR
+  ADMIN
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum WorkType {
+  DIPLOMA
+  COURSE
+  ARTICLE
+  ESSAY
+  PROJECT
+}
+
+enum Language {
+  KAZAKH
+  RUSSIAN
+  ENGLISH
+}
+
+enum WorkStatus {
+  PENDING
+  APPROVED
+  RETURNED
+  REJECTED
+}
+
+enum Decision {
+  APPROVE
+  RETURN
+  REJECT
+}

@@ -1,0 +1,62 @@
+{
+  "name": "task-in",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "prisma generate",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:generate": "prisma generate",
+    "db:generate:clean": "node scripts/clean-prisma-client.cjs && prisma generate",
+    "es:index": "tsx scripts/es-index.ts",
+    "minio:init": "tsx scripts/minio-init.ts",
+    "setup": "npm run db:push && npm run db:seed && npm run es:index && npm run minio:init"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.15.0",
+    "@hookform/resolvers": "^3.9.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.460.0",
+    "minio": "^8.0.2",
+    "next": "14.2.18",
+    "next-auth": "^4.24.10",
+    "nodemailer": "^6.9.16",
+    "pdf-parse": "^1.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.2",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.1"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^20.17.6",
+    "@types/nodemailer": "^6.4.16",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.18",
+    "eslint-config-prettier": "^9.1.0",
+    "postcss": "^8.4.49",
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
