@@ -272,3 +272,10 @@ Task IN жобасы академиялық жұмыстардың толық ц
 **Қосымша Г.** API маршруттарының кестесі (`/api/auth`, `/api/works`, `/api/admin`, т.б.).  
 **Қосымша Д.** Рөлдік сценарийлер картасы (Student/Supervisor/Admin).  
 **Қосымша Е.** Негізгі код үзінділері (`middleware.ts`, `prisma/schema.prisma`, `lib/elasticsearch.ts`, `lib/minio.ts`).
+
+---
+
+## Deploy нұсқаулығы
+
+Жобаны `Vercel` және `Render` арқылы жариялауға арналған толық қадамдық нұсқаулық:  
+`DEPLOYMENT.md`
