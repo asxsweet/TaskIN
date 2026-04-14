@@ -1,6 +1,9 @@
-# Task IN Deployment (Vercel + Render)
+# Task IN Deployment (Local + Vercel + Render)
 
-Бұл нұсқаулық жобаны `Vercel` және `Render` арқылы жариялауға арналған.
+Бұл нұсқаулық жобаны:
+- локалда (`localhost`)
+- интернетте (`Vercel` немесе `Render`)
+бір кодбазамен жүргізуге арналған.
 
 ---
 
@@ -13,7 +16,26 @@
 
 ---
 
-## 1) Environment Variables
+## 1) Local + Hosting бірге жұмыс істеу логикасы
+
+Жоба екі ортада да жұмыс істеуі үшін env айнымалылар **ортаға бөлек** беріледі:
+
+- **Локал**: `akademportal/.env` (немесе `.env.local`)
+- **Vercel**: Project Settings -> Environment Variables
+- **Render**: Service -> Environment
+
+### Неге бөлек?
+
+`NEXTAUTH_URL` әр ортада әртүрлі:
+- локал: `http://localhost:3000`
+- Vercel: `https://your-project.vercel.app`
+- Render: `https://your-service.onrender.com`
+
+Сондықтан бір файлды көшіріп жүрудің орнына, әр платформада өз env қолданған дұрыс.
+
+---
+
+## 2) Environment Variables
 
 Екі платформада да мына env айнымалыларын орнатыңыз:
 
@@ -45,6 +67,7 @@ ITHENTICATE_API_URL=
 ### Маңызды
 
 - `NEXTAUTH_URL` міндетті түрде нақты домен болуы керек:
+  - Local: `http://localhost:3000`
   - Vercel: `https://your-project.vercel.app`
   - Render: `https://your-service.onrender.com`
 - `DATABASE_URL` сыртқы managed PostgreSQL болғаны дұрыс.
@@ -52,7 +75,26 @@ ITHENTICATE_API_URL=
 
 ---
 
-## 2) Vercel-ге шығару
+## 3) Локалда іске қосу (Local Development)
+
+`akademportal` ішінде:
+
+```bash
+npm install --legacy-peer-deps
+npm run db:generate
+npm run db:push
+npm run db:seed
+npm run minio:init
+npm run dev
+```
+
+Ашу: `http://localhost:3000`
+
+Егер Elasticsearch жоқ болса да жоба жұмыс істейді (fallback бар).
+
+---
+
+## 4) Vercel-ге шығару
 
 Жоба түбірінде `vercel.json` дайын тұр.
 
@@ -85,7 +127,7 @@ npm run db:seed
 
 ---
 
-## 3) Render-ге шығару
+## 5) Render-ге шығару
 
 Жоба түбірінде `render.yaml` дайын тұр.
 
@@ -123,7 +165,7 @@ npm run minio:init
 
 ---
 
-## 4) Міндетті тексерістер (post-deploy)
+## 6) Міндетті тексерістер (post-deploy)
 
 1. `/` және `/auth` ашылады
 2. Тіркелу/кіру жұмыс істейді
@@ -134,7 +176,7 @@ npm run minio:init
 
 ---
 
-## 5) Жиі кездесетін қателер
+## 7) Жиі кездесетін қателер
 
 ### `Unauthorized` немесе auth redirect loop
 - `NEXTAUTH_URL` дұрыс емес
