@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") || 20)));
 
     const where: Prisma.UserWhereInput = {
+      deletedAt: null,
       ...(role ? { role: role as "STUDENT" | "SUPERVISOR" | "ADMIN" } : {}),
       ...(q ?
         {
@@ -51,6 +52,7 @@ export async function GET(req: NextRequest) {
         facultyName: u.faculty.name,
         worksCount: u.role === "STUDENT" ? u._count.works : u._count.supervised,
         approvalStatus: u.approvalStatus,
+        isLocked: u.isLocked,
         createdAt: u.createdAt.toISOString(),
       })),
     });

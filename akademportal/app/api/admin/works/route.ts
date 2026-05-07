@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
     const year = searchParams.get("year");
     const type = searchParams.get("type") || undefined;
     const search = searchParams.get("search") || undefined;
+    const flagged = searchParams.get("flagged");
 
     const where: Prisma.WorkWhereInput = { deletedAt: null };
     if (status) where.status = status as never;
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
         { author: { name: { contains: q, mode: "insensitive" } } },
       ];
     }
+    if (flagged === "true") where.moderationFlag = true;
 
     const [total, works] = await prisma.$transaction([
       prisma.work.count({ where }),
@@ -56,6 +58,7 @@ export async function GET(req: NextRequest) {
         facultyName: w.department.faculty.name,
         type: w.type,
         status: w.status,
+        moderationFlag: w.moderationFlag,
         plagiarismScore: w.plagiarismScore,
         createdAt: w.createdAt.toISOString(),
       })),

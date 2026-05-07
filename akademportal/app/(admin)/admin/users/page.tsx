@@ -18,10 +18,10 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Пайдаланушылар</h1>
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-x-auto">
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-x-auto dark:border-neutral-700 dark:bg-neutral-900">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase border-b bg-neutral-50">
+            <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase border-b bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-500">
               <th className="px-6 py-4">Аты</th>
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Рөлі</th>
@@ -30,7 +30,7 @@ export default function AdminUsersPage() {
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-b border-neutral-50">
+              <tr key={u.id} className="border-b border-neutral-50 dark:border-neutral-800">
                 <td className="px-6 py-4 flex items-center gap-2">
                   <Avatar
                     initials={u.name
@@ -44,7 +44,7 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="px-6 py-4">{u.email}</td>
                 <td className="px-6 py-4">{roleLabel(u.role)}</td>
-                <td className="px-6 py-4 text-neutral-500">{u.faculty?.name}</td>
+                <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400">{u.faculty?.name}</td>
               </tr>
             ))}
           </tbody>

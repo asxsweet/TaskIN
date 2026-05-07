@@ -14,7 +14,12 @@ export async function GET(req: NextRequest) {
     const faculties = rawFaculty?.includes(",") ? rawFaculty.split(",").filter(Boolean) : undefined;
     const singleFaculty = rawFaculty && !rawFaculty.includes(",") ? rawFaculty : undefined;
     const year = searchParams.get("year");
+    const yearFrom = searchParams.get("yearFrom");
+    const yearTo = searchParams.get("yearTo");
     const lang = searchParams.get("lang") || undefined;
+    const departmentId = searchParams.get("departmentId") || undefined;
+    const supervisorId = searchParams.get("supervisorId") || undefined;
+    const status = searchParams.get("status") || undefined;
     const sort = searchParams.get("sort") || undefined;
     const page = Number(searchParams.get("page") || 1);
     const pageSize = Number(searchParams.get("pageSize") || 12);
@@ -26,7 +31,12 @@ export async function GET(req: NextRequest) {
       facultyId: singleFaculty,
       facultyIds: faculties,
       year: year ? Number(year) : undefined,
+      yearFrom: yearFrom ? Number(yearFrom) : undefined,
+      yearTo: yearTo ? Number(yearTo) : undefined,
       lang,
+      departmentId,
+      supervisorId,
+      status,
       sort,
       page,
       pageSize,
@@ -36,6 +46,8 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     const err = e as Error & { status?: number };
     if (err.status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (err.status === 403) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    console.error("[api/search]", e);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

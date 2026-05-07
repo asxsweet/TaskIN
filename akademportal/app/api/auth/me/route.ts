@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const user = await requireUser(req);
     const full = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { faculty: true },
+      include: { faculty: true, department: true },
     });
     if (!full) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({
@@ -17,7 +17,11 @@ export async function GET(req: NextRequest) {
       role: full.role,
       facultyId: full.facultyId,
       faculty: full.faculty,
+      department: full.department,
       avatar: full.avatar,
+      phone: full.phone,
+      position: full.position,
+      employeeId: full.employeeId,
       createdAt: full.createdAt.toISOString(),
     });
   } catch (e) {

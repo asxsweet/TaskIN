@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/api-user";
+import { writeAuditLog } from "@/lib/audit";
+import { sanitizeText } from "@/lib/security";
 
 const patchSchema = z.object({
   siteName: z.string().min(1).max(200).optional(),
@@ -43,22 +45,30 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    await requireAdmin(req);
+    const admin = await requireAdmin(req);
     const json = await req.json();
     const body = patchSchema.parse(json);
     const data: Record<string, unknown> = {};
-    if (body.siteName !== undefined) data.siteName = body.siteName;
-    if (body.tagline !== undefined) data.tagline = body.tagline;
+    if (body.siteName !== undefined) data.siteName = sanitizeText(body.siteName);
+    if (body.tagline !== undefined) data.tagline = body.tagline ? sanitizeText(body.tagline) : null;
     if (body.logoUrl !== undefined) data.logoUrl = body.logoUrl || null;
     if (body.emailFrom !== undefined) data.emailFrom = body.emailFrom;
     if (body.contactEmail !== undefined) data.contactEmail = body.contactEmail;
-    if (body.contactPhone !== undefined) data.contactPhone = body.contactPhone;
-    if (body.contactAddress !== undefined) data.contactAddress = body.contactAddress;
+    if (body.contactPhone !== undefined) data.contactPhone = sanitizeText(body.contactPhone);
+    if (body.contactAddress !== undefined) data.contactAddress = sanitizeText(body.contactAddress);
     if (body.socialLinks !== undefined) data.socialLinks = body.socialLinks;
     if (body.emailTemplates !== undefined) data.emailTemplates = body.emailTemplates;
     await prisma.siteSettings.update({
       where: { id: "default" },
       data: data as never,
+    });
+    await writeAuditLog({
+      req,
+      actorId: admin.id,
+      action: "ADMIN_SETTINGS_PATCH",
+      entity: "SiteSettings",
+      entityId: "default",
+      metadata: data,
     });
     return NextResponse.json({ ok: true });
   } catch (e) {

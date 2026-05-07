@@ -27,7 +27,7 @@ export function DashboardGate({ children }: { children: ReactNode }) {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-500 text-sm">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-500 text-sm dark:bg-neutral-950 dark:text-neutral-400">
         Жүктелуде…
       </div>
     );
@@ -35,18 +35,18 @@ export function DashboardGate({ children }: { children: ReactNode }) {
 
   if (role && role !== "STUDENT") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-500 text-sm">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-500 text-sm dark:bg-neutral-950 dark:text-neutral-400">
         Бағыттау…
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 pb-20 md:pb-0">
+    <div className="flex min-h-screen bg-neutral-50 pb-20 md:pb-0 dark:bg-neutral-950">
       <StudentSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar />
-        <main className="p-4 md:p-8 flex-1">{children}</main>
+        <main className="p-4 md:p-6 lg:p-8 flex-1 min-w-0">{children}</main>
       </div>
       <MobileNav />
     </div>

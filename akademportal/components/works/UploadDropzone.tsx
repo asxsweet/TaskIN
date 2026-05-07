@@ -20,7 +20,7 @@ export function UploadDropzone({
         if (f) onFile(f);
       }}
       className={`border-2 border-dashed rounded-xl p-16 flex flex-col items-center justify-center transition-all ${
-        file ? "border-success bg-success-tint/20" : "border-neutral-200 bg-neutral-50"
+        file ? "border-success bg-success-tint/20 dark:bg-success/10" : "border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900"
       }`}
     >
       {!file ?
@@ -29,7 +29,7 @@ export function UploadDropzone({
             <CloudUpload size={32} />
           </div>
           <p className="text-lg font-medium mb-2">Файлды осында сүйреңіз</p>
-          <p className="text-sm text-neutral-400 mb-8">немесе</p>
+          <p className="text-sm text-neutral-400 mb-8 dark:text-neutral-500">немесе</p>
           <Button
             variant="outline"
             type="button"
@@ -49,14 +49,14 @@ export function UploadDropzone({
           />
         </>
       : <div className="w-full max-w-md">
-          <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-success/30 shadow-sm">
+          <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-success/30 shadow-sm dark:bg-neutral-900">
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded bg-success-tint flex items-center justify-center text-success">
                 <FileText size={24} />
               </div>
               <div>
-                <div className="text-sm font-medium text-neutral-900 truncate max-w-[200px]">{file.name}</div>
-                <div className="text-xs text-neutral-400">{formatBytes(file.size)}</div>
+                <div className="text-sm font-medium text-neutral-900 truncate max-w-[200px] dark:text-neutral-100">{file.name}</div>
+                <div className="text-xs text-neutral-400 dark:text-neutral-500">{formatBytes(file.size)}</div>
               </div>
             </div>
             <button type="button" onClick={() => onFile(null)} className="text-neutral-400 hover:text-danger">

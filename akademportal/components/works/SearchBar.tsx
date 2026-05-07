@@ -19,6 +19,11 @@ export function SearchBar({
         className="pl-12 h-12 text-base shadow-sm"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          onSearch();
+        }}
         placeholder="Тақырып, автор, кілт сөз..."
       />
       {value && (
@@ -30,7 +35,7 @@ export function SearchBar({
           <X size={20} />
         </button>
       )}
-      <button type="button" className="sr-only" onClick={onSearch}>
+      <button type="button" className="sr-only" tabIndex={-1} onClick={onSearch}>
         search
       </button>
     </div>

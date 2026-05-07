@@ -117,6 +117,21 @@ export function NotificationBell({ variant = "default" }: Props) {
   }, [status, role, api]);
 
   useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible") loadNotifs();
+    }
+    function onStorage(e: StorageEvent) {
+      if (e.key === "taskin-notifications-updated") loadNotifs();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [status, role, api]);
+
+  useEffect(() => {
     function close(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
@@ -130,6 +145,7 @@ export function NotificationBell({ variant = "default" }: Props) {
     } else {
       await fetch(`/api/notifications/${id}/read`, { method: "POST", credentials: "include" });
     }
+    localStorage.setItem("taskin-notifications-updated", String(Date.now()));
   }
 
   async function onNotifClick(n: NotifItem) {
@@ -148,6 +164,7 @@ export function NotificationBell({ variant = "default" }: Props) {
 
   async function markAllRead() {
     await fetch("/api/notifications/read-all", { method: "PATCH", credentials: "include" });
+    localStorage.setItem("taskin-notifications-updated", String(Date.now()));
     loadNotifs();
   }
 
@@ -155,7 +172,7 @@ export function NotificationBell({ variant = "default" }: Props) {
     <div className={`relative ${variant === "compact" ? "" : ""}`} ref={ref}>
       <button
         type="button"
-        className={`relative text-neutral-400 hover:text-neutral-600 p-1 ${variant === "compact" ? "text-neutral-500" : ""}`}
+        className={`relative text-neutral-400 hover:text-neutral-600 p-1 dark:text-neutral-500 dark:hover:text-neutral-300 ${variant === "compact" ? "text-neutral-500" : ""}`}
         aria-label="notifications"
         aria-expanded={open}
         onClick={() => {
@@ -171,33 +188,33 @@ export function NotificationBell({ variant = "default" }: Props) {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 mt-2 w-[min(100vw-2rem,22rem)] rounded-lg border border-neutral-200 bg-white shadow-lg z-50 overflow-hidden">
-          <div className="max-h-80 overflow-y-auto divide-y divide-neutral-100">
+        <div className="absolute right-0 mt-2 w-[min(100vw-2rem,22rem)] rounded-lg border border-neutral-200 bg-white shadow-lg z-50 overflow-hidden dark:border-neutral-700 dark:bg-neutral-900">
+          <div className="max-h-80 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800">
             {items.length === 0 ?
-              <div className="p-4 text-sm text-neutral-500">Хабарландыру жоқ</div>
+              <div className="p-4 text-sm text-neutral-500 dark:text-neutral-400">Хабарландыру жоқ</div>
             : items.map((n) => (
                 <button
                   key={n.id}
                   type="button"
                   onClick={() => onNotifClick(n)}
-                  className="w-full text-left p-3 hover:bg-neutral-50 flex gap-3 items-start"
+                  className="w-full text-left p-3 hover:bg-neutral-50 flex gap-3 items-start dark:hover:bg-neutral-800"
                 >
                   <TypeIcon type={n.type} />
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-neutral-900 flex items-center gap-2">
+                    <div className="text-sm font-medium text-neutral-900 flex items-center gap-2 dark:text-neutral-100">
                       {n.title}
                       {!n.read && <span className="h-2 w-2 rounded-full bg-primary shrink-0" />}
                     </div>
                     {n.body ?
-                      <p className="text-xs text-neutral-500 line-clamp-2 mt-0.5">{n.body}</p>
+                      <p className="text-xs text-neutral-500 line-clamp-2 mt-0.5 dark:text-neutral-400">{n.body}</p>
                     : null}
-                    <p className="text-[10px] text-neutral-400 mt-1">{formatTime(n.createdAt)}</p>
+                    <p className="text-[10px] text-neutral-400 mt-1 dark:text-neutral-500">{formatTime(n.createdAt)}</p>
                   </div>
                 </button>
               ))
             }
           </div>
-          <div className="border-t border-neutral-100 p-2 flex flex-col gap-1 bg-neutral-50/80">
+          <div className="border-t border-neutral-100 p-2 flex flex-col gap-1 bg-neutral-50/80 dark:border-neutral-800 dark:bg-neutral-800/70">
             <Link
               href={seeAllHref}
               className="text-center text-xs font-medium text-primary py-2 hover:underline"
@@ -211,7 +228,7 @@ export function NotificationBell({ variant = "default" }: Props) {
                 onClick={() => {
                   markAllRead();
                 }}
-                className="text-center text-xs text-neutral-600 py-1 hover:text-neutral-900"
+                className="text-center text-xs text-neutral-600 py-1 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
               >
                 Барлығын оқылды деп белгілеу
               </button>

@@ -12,7 +12,7 @@
 
 @layer base {
   body {
-    @apply font-sans text-neutral-900 bg-white antialiased;
+    @apply font-sans antialiased bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100;
   }
   h1,
   h2,

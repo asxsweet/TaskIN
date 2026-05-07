@@ -28,6 +28,9 @@ export async function GET(req: NextRequest) {
       position: user.position,
       phone: user.phone,
       employeeId: user.employeeId,
+      bio: user.bio,
+      socialLinks: user.socialLinks,
+      interests: user.interests,
       approvalStatus: user.approvalStatus,
       approvedAt: user.approvedAt?.toISOString() ?? null,
     };

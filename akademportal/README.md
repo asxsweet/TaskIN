@@ -1,23 +1,26 @@
 # Task IN
 
-Academic works platform built with Next.js 14, Prisma, PostgreSQL, MinIO, and NextAuth.
+Task IN — академиялық жұмыстарды басқаруға арналған веб-платформа.  
+Технологиялар: Next.js 14, Prisma, PostgreSQL, NextAuth (қосымша Elasticsearch).
 
-## Clone and run (new developer checklist)
+## Жобаны нөлден іске қосу (қадам-қадаммен)
 
-### 1) Prerequisites
+### 1-қадам. Қажетті бағдарламалар
+
+Компьютерде мыналар орнатулы болсын:
 
 - Node.js 20+
 - npm
 - Docker Desktop
 
-### 2) Clone project
+### 2-қадам. Репозиторийді көшіру
 
 ```bash
 git clone <REPO_URL>
 cd akademportal
 ```
 
-### 3) Create environment file
+### 3-қадам. `.env` файлын жасау
 
 Linux/macOS:
 
@@ -31,58 +34,63 @@ Windows PowerShell:
 Copy-Item .env.example .env
 ```
 
-### 4) Start infrastructure
+### 4-қадам. Инфрақұрылымды көтеру (Docker)
 
 ```bash
 docker compose up -d
 ```
 
-This starts:
+Осы команда мына сервистерді іске қосады:
 
 - PostgreSQL (`localhost:5432`)
-- MinIO API (`localhost:9000`)
-- MinIO Console (`localhost:9001`)
-- Elasticsearch (`localhost:9200`, optional)
+- Elasticsearch (`localhost:9200`, міндетті емес)
 
-### 5) Install dependencies
+Контейнерлердің статусын тексеру:
+
+```bash
+docker compose ps
+```
+
+### 5-қадам. Тәуелділіктерді орнату
 
 ```bash
 npm install --legacy-peer-deps
 ```
 
-### 6) Prepare database and storage
+### 6-қадам. Дерекқор және сақтау орнын дайындау
 
 ```bash
 npm run db:generate
 npm run db:push
 npm run db:seed
-npm run minio:init
 ```
 
-Optional Elasticsearch indexing:
+Егер Elasticsearch индекстеу керек болса:
 
 ```bash
 npm run es:index
 ```
 
-### 7) Start app
+### 7-қадам. Жобаны іске қосу
 
 ```bash
 npm run dev
 ```
 
-Open: [http://localhost:3000](http://localhost:3000)
+Браузерде ашыңыз: [http://localhost:3000](http://localhost:3000)
 
-## Default account (after seed)
+## Seed-тен кейінгі бастапқы аккаунт
 
-- Admin: `admin@taskin.kz` / `admin123`
+- Әкімші: `admin@taskin.kz` / `admin123`
 
-Students and supervisors are created via registration flow.  
-Supervisor account must be approved by admin.
+Ескерту:
 
-## `.env` essentials
+- Студент пен жетекші аккаунттары тіркелу арқылы жасалады.
+- Жетекші аккаунтын әкімші бекітуі керек.
 
-Default local values:
+## `.env` ішіндегі негізгі айнымалылар
+
+Жергілікті орта үшін әдепкі мәндер:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/taskin
@@ -90,56 +98,53 @@ NEXTAUTH_SECRET=change-me-to-a-long-random-string
 NEXTAUTH_URL=http://localhost:3000
 JWT_SECRET=
 
-MINIO_ENDPOINT=localhost
-MINIO_PORT=9000
-MINIO_USE_SSL=false
-MINIO_ACCESS_KEY=minio
-MINIO_SECRET_KEY=minio123
-MINIO_BUCKET=academic-works
-
 ELASTICSEARCH_URL=http://localhost:9200
 ```
 
-## Useful scripts
+## Пайдалы командалар
 
-- `npm run dev` - start development server
-- `npm run build` - production build
-- `npm run db:generate` - generate Prisma client
-- `npm run db:push` - apply schema to database
-- `npm run db:seed` - seed base data
-- `npm run minio:init` - create/check MinIO bucket
-- `npm run es:index` - index approved works into Elasticsearch
-- `npm run setup` - `db:push + db:seed + es:index + minio:init`
+- `npm run dev` - development серверді іске қосу
+- `npm run build` - production build жасау
+- `npm run db:generate` - Prisma client генерациялау
+- `npm run db:push` - схема өзгерістерін базаға қолдану
+- `npm run db:seed` - бастапқы деректерді толтыру
+- `npm run es:index` - Elasticsearch-ке индекстеу
+- `npm run setup` - `db:push + db:seed + es:index`
 
-## Quick troubleshooting
+## Жиі кездесетін мәселелер
 
-### `EPERM` on Prisma generate (Windows)
+### 1) Windows-та `EPERM` (Prisma generate)
 
-If `query_engine-windows.dll.node` is locked:
+Егер `query_engine-windows.dll.node` lock болса:
 
-1. stop running dev server / Node processes
-2. close terminals that may lock Prisma files
-3. run `npm run db:generate` again
-
-### Upload fails
-
-Usually MinIO is not running or bucket is missing:
+1. `npm run dev` және басқа Node процестерін тоқтатыңыз
+2. Prisma файлдарын ұстап тұрған терминалдарды жабыңыз
+3. Қайтадан іске қосыңыз:
 
 ```bash
-docker compose ps
-npm run minio:init
+npm run db:generate
 ```
 
-### Reset local database
+### 2) Файл жүктеу істемейді
+
+Бұл нұсқада файлдар PostgreSQL-ге тікелей сақталады. Әдетте мәселе:
+
+- Дерекқор қосылмаған
+- Дерекқорда орын/лимит жетпеген
+- `prisma db push` жасалмаған
+
+### 3) Жергілікті дерекқорды толық тазалап қайта бастау
 
 ```bash
 npx prisma db push --force-reset --accept-data-loss
 npm run db:seed
 ```
 
-## Production deploy
+## Production-ға шығару
 
-Full production guide is in `DEPLOYMENT.md`.
+Толық deploy нұсқаулық: `DEPLOYMENT.md`.
 
-Important: local `localhost` MinIO does not work for production hosting.  
-Use hosted MinIO/S3 endpoint and set production env variables accordingly.
+Маңызды:
+
+- Бұл нұсқада файлдар да PostgreSQL ішінде сақталады (`bytea`/`Bytes`).
+- Production-та үлкен файл ағындары болса, бөлек object storage (S3/MinIO) қарастыру ұсынылады.

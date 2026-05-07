@@ -44,20 +44,20 @@ export function Logo({
       </div>
       <div>
         <div
-          style={{
-            fontSize: titleFs,
-            fontWeight: 500,
-            color: inverse ? "#fff" : "#171717",
-          }}
+          className={cn(
+            "font-medium",
+            inverse ? "text-white" : "text-neutral-900 dark:text-neutral-100"
+          )}
+          style={{ fontSize: titleFs }}
         >
           Task IN
         </div>
         {showTagline ?
           <div
-            style={{
-              fontSize: 10,
-              color: inverse ? "rgba(255,255,255,0.75)" : "#737373",
-            }}
+            className={cn(
+              inverse ? "text-white/75" : "text-neutral-500 dark:text-neutral-400"
+            )}
+            style={{ fontSize: 10 }}
           >
             Білім беру жүйесі
           </div>

@@ -29,15 +29,21 @@ export async function GET(req: NextRequest) {
         },
       }),
     ]);
+    const folders = await prisma.bookmarkFolder.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+    });
 
     return NextResponse.json({
       total,
       page,
       limit,
+      folders,
       items: rows.map((b) => {
         const w = b.work;
         return {
           bookmarkId: b.id,
+          folderId: b.folderId,
           id: w.id,
           title: w.title,
           abstract: w.abstract,

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   Building2,
+  Camera,
   ClipboardCheck,
   GraduationCap,
   Mail,
@@ -26,6 +27,9 @@ type Profile = {
   position: string | null;
   phone: string | null;
   employeeId: string | null;
+  bio?: string | null;
+  socialLinks?: string | null;
+  interests?: string | null;
   approvalStatus: string;
   approvedAt: string | null;
 };
@@ -59,10 +63,14 @@ export function SupervisorProfileView({
   profile,
   stats,
   recentReviews,
+  onAvatarPick,
+  avatarBusy,
 }: {
   profile: Profile;
   stats: Stats;
   recentReviews: RecentReview[];
+  onAvatarPick?: (file?: File) => void;
+  avatarBusy?: boolean;
 }) {
   const initials = profile.name
     .split(" ")
@@ -73,11 +81,25 @@ export function SupervisorProfileView({
   const pendingApproval = profile.approvalStatus === A.PENDING;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 -m-4 md:-m-8 px-4 md:px-8 py-6">
+    <div className="max-w-4xl mx-auto space-y-8 -m-4 md:-m-6 lg:-m-8 px-4 md:px-6 lg:px-8 py-6">
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-violet-700 to-indigo-900 text-white p-6 md:p-8 shadow-lg">
         <div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-fuchsia-400/20 blur-3xl" />
         <div className="relative flex flex-col lg:flex-row lg:items-end gap-6">
-          <Avatar src={profile.avatar} initials={initials} size="lg" className="ring-4 ring-white/25 h-20 w-20 text-lg" />
+          <label className="relative cursor-pointer group">
+            <Avatar src={profile.avatar} initials={initials} size="lg" className="ring-4 ring-white/25 h-20 w-20 text-lg" />
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={(e) => onAvatarPick?.(e.target.files?.[0])}
+            />
+            <span className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 text-white text-[10px] font-medium inline-flex items-center gap-1">
+                <Camera size={12} />
+                {avatarBusy ? "Жүктелуде..." : "Өзгерту"}
+              </span>
+            </span>
+          </label>
           <div className="flex-1 min-w-0">
             <p className="text-violet-100 text-sm font-medium">Жетекші кабинеті</p>
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight truncate">{profile.name}</h1>
@@ -136,25 +158,25 @@ export function SupervisorProfileView({
       : null}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3 dark:border-neutral-700 dark:bg-neutral-900">
           <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-2">
             <Building2 size={14} />
             Орын
           </h3>
-          <p className="font-medium text-neutral-900">{profile.faculty.name}</p>
-          <p className="text-sm text-neutral-600">
-            Кафедра: <span className="font-medium text-neutral-800">{profile.department?.name ?? "—"}</span>
+          <p className="font-medium text-neutral-900 dark:text-neutral-100">{profile.faculty.name}</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Кафедра: <span className="font-medium text-neutral-800 dark:text-neutral-200">{profile.department?.name ?? "—"}</span>
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3 dark:border-neutral-700 dark:bg-neutral-900">
           <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-2">
             <UserCircle size={14} />
             Қызметі
           </h3>
-          <p className="font-medium text-neutral-900">{profile.position ?? "—"}</p>
-          <p className="text-sm text-neutral-600">
+          <p className="font-medium text-neutral-900 dark:text-neutral-100">{profile.position ?? "—"}</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             Қызметтік №:{" "}
-            <span className="font-mono font-medium text-neutral-800">{profile.employeeId ?? "—"}</span>
+            <span className="font-mono font-medium text-neutral-800 dark:text-neutral-200">{profile.employeeId ?? "—"}</span>
           </p>
         </div>
       </div>
@@ -181,10 +203,10 @@ export function SupervisorProfileView({
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-gradient-to-r from-neutral-50 to-white p-4 flex flex-wrap items-center gap-4">
+      <div className="rounded-xl border border-neutral-200 bg-gradient-to-r from-neutral-50 to-white p-4 flex flex-wrap items-center gap-4 dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-800">
         <GraduationCap className="text-violet-600" size={28} />
         <div>
-          <p className="text-sm font-semibold text-neutral-900">Бағытталған студенттер</p>
+          <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Бағытталған студенттер</p>
           <p className="text-2xl font-bold text-violet-700">{stats.studentsCount}</p>
         </div>
         <Link
@@ -195,34 +217,47 @@ export function SupervisorProfileView({
         </Link>
       </div>
 
-      <section className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
-        <div className="border-b border-neutral-100 px-5 py-4 flex items-center justify-between">
-          <h2 className="font-semibold text-neutral-900">Соңғы пікірлер</h2>
+      {(profile.bio || profile.interests || profile.socialLinks) && (
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+          <h3 className="text-sm font-semibold mb-2 dark:text-neutral-100">Қосымша мәлімет</h3>
+          {profile.bio ? <p className="text-sm text-neutral-600 dark:text-neutral-300">{profile.bio}</p> : null}
+          {profile.interests ? (
+            <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">Бағыт: {profile.interests}</p>
+          ) : null}
+          {profile.socialLinks ? (
+            <p className="mt-1 text-xs text-primary break-all">{profile.socialLinks}</p>
+          ) : null}
+        </section>
+      )}
+
+      <section className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="border-b border-neutral-100 px-5 py-4 flex items-center justify-between dark:border-neutral-800">
+          <h2 className="font-semibold text-neutral-900 dark:text-neutral-100">Соңғы пікірлер</h2>
           <Link href="/supervisor/history" className="text-sm text-violet-700 hover:underline">
             Тарих
           </Link>
         </div>
         {recentReviews.length === 0 ?
-          <div className="px-5 py-10 text-center text-neutral-500 text-sm">
+          <div className="px-5 py-10 text-center text-neutral-500 text-sm dark:text-neutral-400">
             Әлі берілген пікір жоқ.{" "}
             <Link href="/supervisor/assigned" className="text-violet-700 font-medium hover:underline">
               Кезектегі жұмыстарды ашыңыз
             </Link>
           </div>
-        : <ul className="divide-y divide-neutral-100">
+        : <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
             {recentReviews.map((r) => (
               <li key={r.id}>
                 <Link
                   href={`/supervisor/review/${r.workId}`}
-                  className="flex flex-col sm:flex-row sm:items-center gap-2 px-5 py-4 hover:bg-neutral-50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center gap-2 px-5 py-4 hover:bg-neutral-50 transition-colors dark:hover:bg-neutral-800"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-neutral-900 truncate">{r.title}</p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
+                    <p className="font-medium text-neutral-900 truncate dark:text-neutral-100">{r.title}</p>
+                    <p className="text-xs text-neutral-500 mt-0.5 dark:text-neutral-400">
                       {r.studentName} · {workTypeLabel(r.type as never)} · {decisionKz[r.decision] ?? r.decision}
                     </p>
                   </div>
-                  <div className="text-xs text-neutral-500 shrink-0">
+                  <div className="text-xs text-neutral-500 shrink-0 dark:text-neutral-400">
                     Баға: {r.overallScore.toFixed(1)} · {new Date(r.createdAt).toLocaleDateString("kk-KZ")}
                   </div>
                 </Link>

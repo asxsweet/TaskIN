@@ -35,13 +35,13 @@ export function Sidebar() {
   const user = data?.user;
 
   return (
-    <aside className="hidden md:flex w-[240px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0">
+    <aside className="hidden md:flex w-[240px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0 dark:border-neutral-800 dark:bg-neutral-900">
       <div className="p-6">
         <Logo />
       </div>
 
       <div className="px-4 mb-8">
-        <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100">
+        <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
           <Avatar
             initials={user?.name
               ?.split(" ")
@@ -51,7 +51,7 @@ export function Sidebar() {
             size="md"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-semibold text-neutral-900 truncate">{user?.name}</span>
+            <span className="text-xs font-semibold text-neutral-900 truncate dark:text-neutral-100">{user?.name}</span>
             <Badge variant="tag" className="w-fit mt-1">
               {roleLabel(user?.role ?? "STUDENT")}
             </Badge>
@@ -75,11 +75,11 @@ export function Sidebar() {
                     "flex items-center justify-between px-3 py-2 rounded-md transition-all group",
                     active ?
                       "bg-primary-tint text-primary border-l-2 border-primary"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={18} className={cn(active ? "text-primary" : "text-neutral-400")} />
+                    <item.icon size={18} className={cn(active ? "text-primary" : "text-neutral-400 dark:text-neutral-500")} />
                     <span className="text-sm font-medium">{item.label}</span>
                   </div>
                 </Link>
@@ -103,7 +103,7 @@ export function Sidebar() {
                     "flex items-center px-3 py-2 rounded-md transition-all",
                     active ?
                       "bg-primary-tint text-primary border-l-2 border-primary"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -127,7 +127,7 @@ export function Sidebar() {
                 "flex items-center px-3 py-2 rounded-md",
                 pathname.startsWith("/admin") ?
                   "bg-primary-tint text-primary border-l-2 border-primary"
-                : "text-neutral-600 hover:bg-neutral-50"
+                : "text-neutral-600 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
               )}
             >
               <Shield size={18} className="mr-3" />
@@ -143,7 +143,7 @@ export function Sidebar() {
           <Link
             href="/settings"
             className={cn(
-              "flex items-center px-3 py-2 rounded-md text-neutral-600 hover:bg-neutral-50",
+              "flex items-center px-3 py-2 rounded-md text-neutral-600 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800",
               pathname === "/settings" && "bg-primary-tint text-primary"
             )}
           >
@@ -153,7 +153,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full text-left flex items-center px-3 py-2 rounded-md text-neutral-600 hover:bg-neutral-50"
+            className="w-full text-left flex items-center px-3 py-2 rounded-md text-neutral-600 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <span className="text-sm font-medium">Шығу</span>
           </button>

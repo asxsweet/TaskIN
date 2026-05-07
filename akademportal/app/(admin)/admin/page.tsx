@@ -102,36 +102,36 @@ export default function AdminHomePage() {
     <div className="space-y-8">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-white p-5 rounded-lg border border-neutral-200 shadow-xs">
+          <div key={kpi.label} className="bg-white p-5 rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
             <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-3">{kpi.label}</div>
-            <div className="text-2xl font-bold text-neutral-900">{kpi.value}</div>
+            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{kpi.value}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs">
-          <h3 className="text-sm font-bold text-neutral-900 mb-6">Факультет бойынша жұмыстар</h3>
+        <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
+          <h3 className="text-sm font-bold text-neutral-900 mb-6 dark:text-neutral-100">Факультет бойынша жұмыстар</h3>
           {dash.facultyStats.length === 0 ?
             <EmptyState title="Деректер жоқ" description="Факультет пен жұмыс қосылғанда көрінеді." />
           : <FacultyBars rows={dash.facultyStats} />}
         </div>
-        <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs">
-          <h3 className="text-sm font-bold text-neutral-900 mb-6">Жұмыс түрлері</h3>
+        <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
+          <h3 className="text-sm font-bold text-neutral-900 mb-6 dark:text-neutral-100">Жұмыс түрлері</h3>
           {typeTotal === 0 ?
             <EmptyState title="Деректер жоқ" />
           : <TypeDonut types={dash.typeStats} total={typeTotal} />}
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs">
-        <h3 className="text-sm font-bold text-neutral-900 mb-6">Белсенділік (30 күн)</h3>
+      <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
+        <h3 className="text-sm font-bold text-neutral-900 mb-6 dark:text-neutral-100">Белсенділік (30 күн)</h3>
         <ActivitySparkline points={dash.activityLast30} />
       </div>
 
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-hidden">
-        <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-neutral-900">Тексеру кезегі</h3>
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-hidden dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="p-6 border-b border-neutral-100 flex items-center justify-between dark:border-neutral-800">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">Тексеру кезегі</h3>
           <Link href="/admin/works">
             <Button variant="ghost" size="sm">
               Барлығын қарау

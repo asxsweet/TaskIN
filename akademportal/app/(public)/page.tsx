@@ -16,21 +16,21 @@ export default async function LandingPage() {
   const tagline = site?.tagline?.trim() || "";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-neutral-950">
       <Navbar site={site} />
 
       <section className="relative overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-48">
-        <div className="mx-auto max-w-7xl px-6 lg:px-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-20 xl:px-24">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-[55%] z-10">
               <div className="inline-flex items-center rounded-pill bg-primary-tint px-4 py-1.5 text-sm font-medium text-primary mb-8">
                 ✦ {formatNumber(s.worksCount)} академиялық жұмыс жинақталды
               </div>
 
-              <h1 className="font-display text-5xl lg:text-[64px] leading-[1.05] tracking-tight text-neutral-950 mb-4">
+              <h1 className="font-display text-5xl lg:text-[64px] leading-[1.05] tracking-tight text-neutral-950 mb-4 dark:text-neutral-100">
                 {siteName}
               </h1>
-              <p className="text-lg lg:text-xl text-neutral-600 max-w-[540px] mb-10 whitespace-pre-line">
+              <p className="text-lg lg:text-xl text-neutral-600 max-w-[540px] mb-10 whitespace-pre-line dark:text-neutral-300">
                 {tagline || "Университеттің дипломдық, курстық жұмыстары мен ғылыми мақалалары бір платформада."}
               </p>
 
@@ -49,21 +49,21 @@ export default async function LandingPage() {
 
               <div className="flex items-center gap-12">
                 <div>
-                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1">
+                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1 dark:text-neutral-100">
                     {formatNumber(s.worksCount)}
                   </div>
                   <div className="text-[13px] text-neutral-500 uppercase tracking-wider">Жұмыс</div>
                 </div>
-                <div className="h-10 w-px bg-neutral-200" />
+                <div className="h-10 w-px bg-neutral-200 dark:bg-neutral-700" />
                 <div>
-                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1">
+                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1 dark:text-neutral-100">
                     {formatNumber(s.usersCount)}
                   </div>
                   <div className="text-[13px] text-neutral-500 uppercase tracking-wider">Студент</div>
                 </div>
-                <div className="h-10 w-px bg-neutral-200" />
+                <div className="h-10 w-px bg-neutral-200 dark:bg-neutral-700" />
                 <div>
-                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1">
+                  <div className="text-[28px] font-semibold text-neutral-900 leading-none mb-1 dark:text-neutral-100">
                     {formatNumber(s.facultiesCount)}
                   </div>
                   <div className="text-[13px] text-neutral-500 uppercase tracking-wider">Факультет</div>
@@ -106,10 +106,10 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-neutral-50 py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-20">
+      <section className="bg-neutral-50 py-24 lg:py-32 dark:bg-neutral-900">
+        <div className="mx-auto max-w-7xl px-6 lg:px-20 xl:px-24">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-medium text-neutral-900">Неліктен {siteName}?</h2>
+            <h2 className="text-3xl lg:text-4xl font-medium text-neutral-900 dark:text-neutral-100">Неліктен {siteName}?</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -130,12 +130,12 @@ export default async function LandingPage() {
                 desc: "Факультет/жыл/тіл бойынша сүзгі",
               },
             ].map((feature) => (
-              <div key={feature.title} className="bg-white p-8 rounded-lg border border-neutral-100 shadow-xs">
+              <div key={feature.title} className="bg-white p-8 rounded-lg border border-neutral-100 shadow-xs dark:border-neutral-700 dark:bg-neutral-950">
                 <div className="h-12 w-12 rounded-md bg-primary-tint flex items-center justify-center mb-6">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
-                <p className="text-neutral-500 leading-relaxed">{feature.desc}</p>
+                <p className="text-neutral-500 leading-relaxed dark:text-neutral-400">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -143,7 +143,7 @@ export default async function LandingPage() {
       </section>
 
       <section className="py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-20 xl:px-24">
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-2xl font-semibold">Соңғы жұмыстар</h2>
             {recent.length > 0 ?
@@ -179,7 +179,7 @@ export default async function LandingPage() {
       </section>
 
       <section className="bg-primary py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-20 text-center">
+        <div className="mx-auto max-w-7xl px-6 lg:px-20 xl:px-24 text-center">
           <h2 className="text-3xl lg:text-4xl font-medium text-white mb-4">
             Жұмысыңызды {siteName} арқылы жүктеңіз
           </h2>

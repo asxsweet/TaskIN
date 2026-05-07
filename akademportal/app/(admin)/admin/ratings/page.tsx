@@ -32,14 +32,14 @@ export default function AdminRatingsPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-xl font-semibold">Бағалаулар</h1>
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs overflow-hidden dark:border-neutral-700 dark:bg-neutral-900">
         <LeaderboardTable rows={rows} />
       </div>
-      <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs">
-        <h3 className="text-sm font-bold text-neutral-900 mb-6">Жетекшілер белсенділігі</h3>
+      <div className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
+        <h3 className="text-sm font-bold text-neutral-900 mb-6 dark:text-neutral-100">Жетекшілер белсенділігі</h3>
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase border-b">
+            <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase border-b dark:border-neutral-700 dark:text-neutral-500">
               <th className="pb-4">Жетекші</th>
               <th className="pb-4">Тағайындалды</th>
               <th className="pb-4">Аяқталды</th>
@@ -48,7 +48,7 @@ export default function AdminRatingsPage() {
           </thead>
           <tbody>
             {rev.map((x) => (
-              <tr key={x.id} className="border-b border-neutral-50">
+              <tr key={x.id} className="border-b border-neutral-50 dark:border-neutral-800">
                 <td className="py-3 font-medium">{x.name}</td>
                 <td className="py-3">{x.assigned}</td>
                 <td className="py-3 text-success font-bold">{x.completed}</td>

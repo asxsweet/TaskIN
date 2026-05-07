@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 const variants: Record<string, string> = {
   type: "bg-primary-tint text-primary border border-primary/10",
-  tag: "bg-neutral-100 text-neutral-600 border border-neutral-200",
+  tag: "bg-neutral-100 text-neutral-600 border border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700",
   approved: "bg-success-tint text-success",
   pending: "bg-warning-tint text-warning",
   rejected: "bg-danger-tint text-danger",

@@ -59,16 +59,16 @@ export default function AdminSystemSettingsPage() {
   return (
     <div className="max-w-2xl space-y-8">
       <h1 className="text-xl font-semibold">Жүйе баптаулары</h1>
-      <form onSubmit={save} className="space-y-6 rounded-lg border border-neutral-200 bg-white p-6">
+      <form onSubmit={save} className="space-y-6 rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
         <div>
           <h2 className="text-sm font-semibold mb-3">Жалпы</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-neutral-500">Сайт атауы</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Сайт атауы</label>
               <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} className="mt-1" />
             </div>
             <div>
-              <label className="text-xs text-neutral-500">Слоган</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Слоган</label>
               <Input value={tagline} onChange={(e) => setTagline(e.target.value)} className="mt-1" />
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function AdminSystemSettingsPage() {
           <h2 className="text-sm font-semibold mb-3">Email жіберу</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-neutral-500">From (noreply)</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">From (noreply)</label>
               <Input value={emailFrom} onChange={(e) => setEmailFrom(e.target.value)} className="mt-1" />
             </div>
           </div>
@@ -86,15 +86,15 @@ export default function AdminSystemSettingsPage() {
           <h2 className="text-sm font-semibold mb-3">Байланыс</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-neutral-500">Email</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Email</label>
               <Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="mt-1" />
             </div>
             <div>
-              <label className="text-xs text-neutral-500">Телефон</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Телефон</label>
               <Input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="mt-1" />
             </div>
             <div>
-              <label className="text-xs text-neutral-500">Мекенжай</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Мекенжай</label>
               <Input value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} className="mt-1" />
             </div>
           </div>
@@ -102,7 +102,7 @@ export default function AdminSystemSettingsPage() {
         <div>
           <h2 className="text-sm font-semibold mb-3">Әлеуметтік желілер (JSON)</h2>
           <textarea
-            className="w-full min-h-[100px] rounded-md border border-neutral-200 px-3 py-2 text-sm font-mono"
+            className="w-full min-h-[100px] rounded-md border border-neutral-200 px-3 py-2 text-sm font-mono dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
             value={socialLinks}
             onChange={(e) => setSocialLinks(e.target.value)}
           />

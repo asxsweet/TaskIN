@@ -1,6 +1,8 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { hitRateLimit } from "@/lib/rate-limit";
+import { isStateChanging } from "@/lib/security";
 
 const ROLE_HOME: Record<string, string> = {
   STUDENT: "/dashboard",
@@ -15,6 +17,25 @@ function starts(pathname: string, base: string) {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const secret = process.env.NEXTAUTH_SECRET;
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (starts(pathname, "/api")) {
+    const baseKey = `${ip}:${pathname}:${req.method}`;
+    const strict =
+      starts(pathname, "/api/auth/login") ||
+      starts(pathname, "/api/auth/register") ||
+      starts(pathname, "/api/works");
+    const limit = hitRateLimit(baseKey, {
+      max: strict ? 20 : 120,
+      windowMs: 60_000,
+    });
+    if (limit.limited) {
+      return NextResponse.json(
+        { error: "Too many requests. Қайтадан сәл кейінірек көріңіз." },
+        { status: 429 }
+      );
+    }
+  }
 
   if (
     pathname.startsWith("/_next") ||
@@ -48,6 +69,17 @@ export async function middleware(req: NextRequest) {
 
   if (isPublicApi) {
     return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api") && isStateChanging(req.method)) {
+    const origin = req.headers.get("origin");
+    const host = req.headers.get("host");
+    if (origin && host) {
+      const expected = `${req.nextUrl.protocol}//${host}`;
+      if (origin !== expected) {
+        return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
+      }
+    }
   }
 
   if (!role) {

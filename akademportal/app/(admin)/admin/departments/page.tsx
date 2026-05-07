@@ -96,9 +96,9 @@ export default function AdminDepartmentsPage() {
         <EmptyState title="Алдымен факультет қосыңыз" actionLabel="Факультеттерге өту" actionHref="/admin/faculties" />
       : (
         <>
-          <form onSubmit={add} className="flex flex-col sm:flex-row flex-wrap gap-2 items-end rounded-lg border border-neutral-200 bg-white p-4">
+          <form onSubmit={add} className="flex flex-col sm:flex-row flex-wrap gap-2 items-end rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
             <div>
-              <label className="text-xs text-neutral-500">Факультет</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Факультет</label>
               <Select value={facultyId} onChange={(e) => setFacultyId(e.target.value)} className="min-w-[200px]">
                 {faculties.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -108,7 +108,7 @@ export default function AdminDepartmentsPage() {
               </Select>
             </div>
             <div className="flex-1 min-w-[200px]">
-              <label className="text-xs text-neutral-500">Кафедра атауы</label>
+              <label className="text-xs text-neutral-500 dark:text-neutral-400">Кафедра атауы</label>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <Button type="submit">+ Қосу</Button>
@@ -117,9 +117,9 @@ export default function AdminDepartmentsPage() {
           {items.length === 0 ?
             <EmptyState title="Бұл факультетте кафедра жоқ" />
           : (
-            <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden">
+            <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden dark:border-neutral-700 dark:bg-neutral-900">
               <table className="w-full text-sm">
-                <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+                <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
                   <tr>
                     <th className="px-4 py-3">Кафедра</th>
                     <th className="px-4 py-3">Факультет</th>
@@ -129,7 +129,7 @@ export default function AdminDepartmentsPage() {
                 </thead>
                 <tbody>
                   {items.map((d) => (
-                    <tr key={d.id} className="border-t border-neutral-100">
+                    <tr key={d.id} className="border-t border-neutral-100 dark:border-neutral-800">
                       <td className="px-4 py-3">
                         {editing === d.id ?
                           <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8" />

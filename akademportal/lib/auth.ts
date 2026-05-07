@@ -20,6 +20,7 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email.toLowerCase() },
         });
         if (!user) return null;
+        if (user.deletedAt || user.isLocked) return null;
         const ok = await bcrypt.compare(credentials.password, user.password);
         if (!ok) return null;
         if (user.role === R.SUPERVISOR) {

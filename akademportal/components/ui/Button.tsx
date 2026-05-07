@@ -12,10 +12,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", type = "button", ...props }, ref) => {
     const variants = {
       primary: "bg-primary text-white hover:bg-primary/90 shadow-sm",
-      secondary: "bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 shadow-xs",
-      ghost: "bg-transparent text-primary hover:bg-primary-tint",
+      secondary:
+        "bg-white text-neutral-900 border border-neutral-200 hover:bg-neutral-50 shadow-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800",
+      ghost: "bg-transparent text-primary hover:bg-primary-tint dark:text-neutral-200 dark:hover:bg-neutral-800",
       danger: "bg-danger text-white hover:bg-danger/90 shadow-sm",
-      outline: "bg-transparent text-primary border border-primary hover:bg-primary-tint",
+      outline:
+        "bg-transparent text-primary border border-primary hover:bg-primary-tint dark:text-neutral-200 dark:border-neutral-600 dark:hover:bg-neutral-800",
     };
     const sizes = {
       sm: "h-9 px-3 text-sm",

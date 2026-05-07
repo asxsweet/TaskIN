@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -20,6 +20,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { apiJsonSafe } from "@/lib/fetcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const MAIN = [
   { href: "/supervisor", label: "Басқару тақтасы", icon: LayoutDashboard },
@@ -31,6 +32,19 @@ const STUDENTS = [
   { href: "/supervisor/students", label: "Студенттерім", icon: Users },
   { href: "/supervisor/history", label: "Тексеру тарихы", icon: History },
 ];
+
+function supervisorSectionTitle(pathname: string | null) {
+  const p = pathname || "";
+  if (p.startsWith("/supervisor/settings")) return "Баптаулар";
+  if (p.startsWith("/supervisor/profile")) return "Профиль";
+  if (p.startsWith("/supervisor/students")) return "Студенттерім";
+  if (p.startsWith("/supervisor/history")) return "Тексеру тарихы";
+  if (p.startsWith("/supervisor/notifications")) return "Хабарландырулар";
+  if (p.startsWith("/supervisor/assigned")) return "Тексеру кезегі";
+  if (p === "/supervisor" || p === "/supervisor/") return "Басқару тақтасы";
+  if (p.startsWith("/supervisor/")) return "Басқару";
+  return "Басқару тақтасы";
+}
 
 export function SupervisorShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -44,6 +58,8 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
     );
   }, [pathname, status]);
 
+  const supervisorTitle = useMemo(() => supervisorSectionTitle(pathname), [pathname]);
+
   const fullBleed = pathname?.includes("/supervisor/review/");
 
   if (fullBleed) {
@@ -51,8 +67,8 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
-      <aside className="hidden md:flex w-[240px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0">
+    <div className="flex min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <aside className="hidden md:flex w-[260px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="p-6">
           <Logo href="/" />
         </div>
@@ -60,7 +76,7 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
           <Link
             href="/supervisor/profile"
             className={cn(
-              "flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 transition-all hover:bg-neutral-100 hover:border-neutral-200",
+              "flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 transition-all hover:bg-neutral-100 hover:border-neutral-200 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
               pathname === "/supervisor/profile" && "ring-2 ring-violet-500/30 border-violet-200 bg-violet-50/50"
             )}
           >
@@ -97,8 +113,10 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
                     key={l.href}
                     href={l.href}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium",
-                      active ? "bg-violet-50 text-violet-800 border-l-2 border-violet-600" : "text-neutral-600 hover:bg-neutral-50"
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium border-l-2",
+                      active ?
+                        "bg-violet-50 text-violet-800 border-violet-600"
+                      : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                     )}
                   >
                     <l.icon size={18} />
@@ -119,8 +137,10 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
                     key={l.href}
                     href={l.href}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium",
-                      active ? "bg-violet-50 text-violet-800 border-l-2 border-violet-600" : "text-neutral-600 hover:bg-neutral-50"
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium border-l-2",
+                      active ?
+                        "bg-violet-50 text-violet-800 border-violet-600"
+                      : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                     )}
                   >
                     <l.icon size={18} />
@@ -134,8 +154,10 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
             <Link
               href="/supervisor/settings"
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-50",
-                pathname.startsWith("/supervisor/settings") && "bg-violet-50 text-violet-800"
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium border-l-2 text-neutral-600 hover:bg-neutral-50",
+                pathname.startsWith("/supervisor/settings") ?
+                  "bg-violet-50 text-violet-800 border-violet-600"
+                : "border-transparent"
               )}
             >
               <Settings size={18} />
@@ -153,11 +175,18 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
         </nav>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-8 sticky top-0 z-40">
-          <div className="text-sm text-neutral-500">Жетекші панелі</div>
-          <NotificationBell variant="compact" />
+        <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-6 lg:px-8 sticky top-0 z-40 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="text-sm text-neutral-500 min-w-0 truncate pr-4">
+            <span className="text-neutral-500 dark:text-neutral-400">Жетекші панелі</span>{" "}
+            <span className="text-neutral-300 dark:text-neutral-600">/</span>{" "}
+            <span className="text-neutral-900 font-medium dark:text-neutral-100">{supervisorTitle}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <NotificationBell variant="compact" />
+          </div>
         </header>
-        <main className="p-4 md:p-8 flex-1">{children}</main>
+        <main className="p-4 md:p-6 lg:p-8 flex-1 min-w-0">{children}</main>
       </div>
     </div>
   );

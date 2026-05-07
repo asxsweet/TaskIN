@@ -72,9 +72,9 @@ export default function AdminFacultiesPage() {
     <div className="space-y-8 max-w-4xl">
       <h1 className="text-xl font-semibold">Факультеттер</h1>
 
-      <form onSubmit={add} className="flex flex-wrap gap-2 items-end rounded-lg border border-neutral-200 bg-white p-4">
+      <form onSubmit={add} className="flex flex-wrap gap-2 items-end rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
         <div className="flex-1 min-w-[200px]">
-          <label className="text-xs text-neutral-500">Жаңа факультет атауы</label>
+          <label className="text-xs text-neutral-500 dark:text-neutral-400">Жаңа факультет атауы</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Мысалы: Инженерлік" />
         </div>
         <Button type="submit">+ Қосу</Button>
@@ -83,9 +83,9 @@ export default function AdminFacultiesPage() {
       {items.length === 0 ?
         <EmptyState title="Факультеттер жоқ" description="Студент жүктеу формасы үшін алдымен факультет пен кафедра қосыңыз." />
       : (
-        <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden">
+        <div className="rounded-lg border border-neutral-200 bg-white overflow-hidden dark:border-neutral-700 dark:bg-neutral-900">
           <table className="w-full text-sm">
-            <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+            <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
               <tr>
                 <th className="px-4 py-3">Атауы</th>
                 <th className="px-4 py-3">Кафедралар</th>
@@ -95,7 +95,7 @@ export default function AdminFacultiesPage() {
             </thead>
             <tbody>
               {items.map((f) => (
-                <tr key={f.id} className="border-t border-neutral-100">
+                <tr key={f.id} className="border-t border-neutral-100 dark:border-neutral-800">
                   <td className="px-4 py-3">
                     {editing === f.id ?
                       <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8" />

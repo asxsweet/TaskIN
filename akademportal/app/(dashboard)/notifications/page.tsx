@@ -25,12 +25,12 @@ export default function StudentNotificationsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">Хабарландырулар</h1>
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white dark:divide-neutral-800 dark:border-neutral-700 dark:bg-neutral-900">
         {items.map((n) => (
           <li key={n.id}>
             <button
               type="button"
-              className="w-full text-left p-4 hover:bg-neutral-50 flex gap-3"
+              className="w-full text-left p-4 hover:bg-neutral-50 flex gap-3 dark:hover:bg-neutral-800"
               onClick={() => onOpen(n.id, n.link)}
             >
               <div className="mt-0.5 rounded-full bg-blue-100 p-2 text-blue-700">
@@ -41,7 +41,7 @@ export default function StudentNotificationsPage() {
                   {n.title}
                   {!n.read ? <span className="h-2 w-2 rounded-full bg-blue-600" /> : null}
                 </div>
-                {n.body ? <p className="text-sm text-neutral-600 mt-1">{n.body}</p> : null}
+                {n.body ? <p className="text-sm text-neutral-600 mt-1 dark:text-neutral-400">{n.body}</p> : null}
               </div>
             </button>
           </li>

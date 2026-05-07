@@ -57,7 +57,7 @@ export function WorkCard({
     <motion.div
       whileHover={{ borderColor: "#1E52CC" }}
       className={cn(
-        "bg-white border border-neutral-200 rounded-lg shadow-xs overflow-hidden transition-all duration-150",
+        "bg-white border border-neutral-200 rounded-lg shadow-xs overflow-hidden transition-all duration-150 dark:border-neutral-700 dark:bg-neutral-900",
         isHorizontal ? "md:flex gap-6 p-6" : "p-5 flex flex-col gap-4",
         isCompact && "p-4"
       )}
@@ -71,7 +71,7 @@ export function WorkCard({
 
         <h3
           className={cn(
-            "font-medium text-neutral-900 line-clamp-2 leading-tight",
+            "font-medium text-neutral-900 line-clamp-2 leading-tight dark:text-neutral-100",
             isCompact ? "text-sm" : "text-base"
           )}
         >
@@ -79,7 +79,7 @@ export function WorkCard({
         </h3>
 
         {!isCompact && (
-          <div className="flex items-center gap-2 text-[13px] text-neutral-600 flex-wrap">
+          <div className="flex items-center gap-2 text-[13px] text-neutral-600 flex-wrap dark:text-neutral-300">
             <Avatar
               initials={authorName
                 .split(" ")
@@ -89,19 +89,19 @@ export function WorkCard({
               size="sm"
             />
             <span>{authorName}</span>
-            <span className="text-neutral-300">•</span>
+            <span className="text-neutral-300 dark:text-neutral-600">•</span>
             <span>{facultyName}</span>
             {supervisorName && (
               <>
-                <span className="text-neutral-300">•</span>
-                <span className="text-neutral-400">Жетекші: {supervisorName}</span>
+                <span className="text-neutral-300 dark:text-neutral-600">•</span>
+                <span className="text-neutral-400 dark:text-neutral-500">Жетекші: {supervisorName}</span>
               </>
             )}
           </div>
         )}
 
         {!isCompact && (
-          <p className="text-[13px] text-neutral-500 line-clamp-3 leading-relaxed">{abstract}</p>
+          <p className="text-[13px] text-neutral-500 line-clamp-3 leading-relaxed dark:text-neutral-400">{abstract}</p>
         )}
 
         {!isCompact && (
@@ -115,7 +115,7 @@ export function WorkCard({
         )}
 
         <div className="flex items-center justify-between mt-auto pt-2 gap-2 flex-wrap">
-          <div className="flex items-center gap-4 text-[12px] text-neutral-400">
+          <div className="flex items-center gap-4 text-[12px] text-neutral-400 dark:text-neutral-500">
             <span className="flex items-center gap-1">
               <Eye size={14} /> {views}
             </span>

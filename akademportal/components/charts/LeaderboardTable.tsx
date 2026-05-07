@@ -12,7 +12,7 @@ export function LeaderboardTable({
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 border-b border-neutral-100">
+          <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 border-b border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-500">
             <th className="px-6 py-4">Орын</th>
             <th className="px-6 py-4">Тақырып</th>
             <th className="px-6 py-4">Автор</th>
@@ -23,7 +23,7 @@ export function LeaderboardTable({
         </thead>
         <tbody className="text-sm">
           {rows.map((row) => (
-            <tr key={row.id} className="border-b border-neutral-50 hover:bg-neutral-50">
+            <tr key={row.id} className="border-b border-neutral-50 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
               <td className="px-6 py-4">
                 <div className="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold bg-warning text-white">
                   {row.rank}
@@ -34,15 +34,15 @@ export function LeaderboardTable({
                   {row.title}
                 </Link>
               </td>
-              <td className="px-6 py-4 text-neutral-600">{row.author}</td>
-              <td className="px-6 py-4 text-neutral-500">{row.faculty}</td>
+              <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300">{row.author}</td>
+              <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400">{row.faculty}</td>
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <ScoreRing score={row.score} size={32} strokeWidth={3} />
                   <span className="font-bold">{row.score}</span>
                 </div>
               </td>
-              <td className="px-6 py-4 text-neutral-400">{row.downloads}</td>
+              <td className="px-6 py-4 text-neutral-400 dark:text-neutral-500">{row.downloads}</td>
             </tr>
           ))}
         </tbody>

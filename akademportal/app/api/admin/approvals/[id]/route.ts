@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { A, R } from "@/lib/prisma-enums";
 import { requireAdmin } from "@/lib/api-user";
 import { notifySupervisorApproved, notifySupervisorRejected } from "@/lib/email";
+import { writeAuditLog } from "@/lib/audit";
+import { sanitizeText } from "@/lib/security";
 
 const patchSchema = z.object({
   action: z.enum(["approve", "reject"]),
@@ -42,6 +44,14 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       const baseUrl = (process.env.NEXTAUTH_URL || "http://localhost:3000").replace(/\/$/, "");
       const loginUrl = `${baseUrl}/auth`;
       await notifySupervisorApproved(target.email, target.name, loginUrl);
+      await writeAuditLog({
+        req,
+        actorId: admin.id,
+        action: "APPROVAL_APPROVE",
+        entity: "User",
+        entityId: target.id,
+        metadata: { targetEmail: target.email },
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -51,16 +61,25 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     if (!body.note?.trim()) {
       return NextResponse.json({ error: "note required for reject" }, { status: 400 });
     }
+    const cleanedNote = sanitizeText(body.note);
     await prisma.user.update({
       where: { id },
       data: {
         approvalStatus: A.REJECTED,
-        approvalNote: body.note.trim(),
+        approvalNote: cleanedNote,
         approvedById: admin.id,
         approvedAt: new Date(),
       },
     });
-    await notifySupervisorRejected(target.email, target.name, body.note.trim());
+    await notifySupervisorRejected(target.email, target.name, cleanedNote);
+    await writeAuditLog({
+      req,
+      actorId: admin.id,
+      action: "APPROVAL_REJECT",
+      entity: "User",
+      entityId: target.id,
+      metadata: { targetEmail: target.email, note: cleanedNote },
+    });
     return NextResponse.json({ ok: true });
   } catch (e) {
     const err = e as Error & { status?: number };

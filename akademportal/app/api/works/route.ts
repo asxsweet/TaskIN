@@ -3,11 +3,31 @@ import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/api-user";
 import { workCreateSchema } from "@/lib/validations";
-import { uploadWorkFile } from "@/lib/minio";
 import { checkPlagiarism } from "@/lib/ithenticate";
 import { indexWork } from "@/lib/elasticsearch";
 import { notifySupervisorAssigned } from "@/lib/email";
 import { Prisma } from "@prisma/client";
+import { sanitizeText } from "@/lib/security";
+
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const ALLOWED_MIME = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+function hasPdfSignature(buf: Buffer) {
+  return buf.length >= 5 && buf.subarray(0, 5).toString("utf8") === "%PDF-";
+}
+
+function hasZipSignature(buf: Buffer) {
+  return (
+    buf.length >= 4 &&
+    buf[0] === 0x50 &&
+    buf[1] === 0x4b &&
+    buf[2] === 0x03 &&
+    buf[3] === 0x04
+  );
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -124,21 +144,32 @@ export async function POST(req: NextRequest) {
     const buf = Buffer.from(await file.arrayBuffer());
     const mime = file.type || "application/octet-stream";
     const originalName = (file as File).name || "upload.bin";
+    const size = buf.length;
+    const ext = originalName.toLowerCase().split(".").pop() || "";
 
-    let path: string;
-    let size: number;
-    try {
-      const up = await uploadWorkFile(buf, originalName, mime);
-      path = up.path;
-      size = up.size;
-    } catch {
+    if (size > MAX_UPLOAD_BYTES) {
       return NextResponse.json(
-        {
-          error:
-            "Файл сақтау сәтсіз (MinIO/S3). MINIO_* орталықтары мен npm run minio:init орындалғанын тексеріңіз.",
-        },
-        { status: 503 }
+        { error: "Файл өлшемі 25MB-тан аспауы керек" },
+        { status: 400 }
       );
+    }
+    if (!ALLOWED_MIME.has(mime)) {
+      return NextResponse.json(
+        { error: "Тек PDF немесе DOCX файлдарын жүктеуге болады" },
+        { status: 400 }
+      );
+    }
+    if (ext !== "pdf" && ext !== "docx") {
+      return NextResponse.json(
+        { error: "Файл кеңейтімі PDF немесе DOCX болуы керек" },
+        { status: 400 }
+      );
+    }
+    if (ext === "pdf" && !hasPdfSignature(buf)) {
+      return NextResponse.json({ error: "PDF файл құрылымы қате" }, { status: 400 });
+    }
+    if (ext === "docx" && !hasZipSignature(buf)) {
+      return NextResponse.json({ error: "DOCX файл құрылымы қате" }, { status: 400 });
     }
 
     let pageCount: number | null = null;
@@ -168,12 +199,14 @@ export async function POST(req: NextRequest) {
 
     const work = await prisma.work.create({
       data: {
-        title: meta.title,
-        abstract: meta.abstract,
+        title: sanitizeText(meta.title),
+        abstract: sanitizeText(meta.abstract),
         type: meta.type,
         year: meta.year,
         language: meta.language,
-        filePath: path,
+        fileName: originalName,
+        fileMimeType: mime,
+        fileData: buf,
         fileSize: size,
         pageCount,
         plagiarismScore,

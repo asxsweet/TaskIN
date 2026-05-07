@@ -11,7 +11,7 @@
 
 1. Репозиторий GitHub-қа push жасалған болуы керек.
 2. PostgreSQL дерекқоры дайын болуы керек (Neon/Supabase/Render Postgres және т.б.).
-3. MinIO/S3 bucket дайын болуы керек (жоба файл жүктеу үшін қажет).
+3. PostgreSQL storage көлемі файлдарға жеткілікті болуы керек (файлдар базада сақталады).
 4. `NEXTAUTH_SECRET` үшін ұзын, кездейсоқ мән дайындаңыз.
 
 ---
@@ -45,13 +45,6 @@ NEXTAUTH_SECRET=
 NEXTAUTH_URL=
 JWT_SECRET=
 
-MINIO_ENDPOINT=
-MINIO_PORT=
-MINIO_USE_SSL=
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
-MINIO_BUCKET=
-
 ELASTICSEARCH_URL=
 
 SMTP_HOST=
@@ -84,7 +77,6 @@ npm install --legacy-peer-deps
 npm run db:generate
 npm run db:push
 npm run db:seed
-npm run minio:init
 npm run dev
 ```
 
@@ -157,12 +149,6 @@ npm run db:push
 npm run db:seed
 ```
 
-3. MinIO bucket әлі жоқ болса:
-
-```bash
-npm run minio:init
-```
-
 ---
 
 ## 6) Міндетті тексерістер (post-deploy)
@@ -170,7 +156,7 @@ npm run minio:init
 1. `/` және `/auth` ашылады
 2. Тіркелу/кіру жұмыс істейді
 3. Admin логин (`admin@taskin.kz / admin123`) жұмыс істейді (seed орындалса)
-4. Файл upload қате бермейді (MinIO дұрыс қосылған)
+4. Файл upload/download қате бермейді (DB storage дұрыс жұмыс істейді)
 5. Іздеу жұмыс істейді (Elasticsearch бар немесе SQL fallback)
 6. Role-based беттерге рұқсат дұрыс бөлінеді
 
@@ -182,9 +168,10 @@ npm run minio:init
 - `NEXTAUTH_URL` дұрыс емес
 - `NEXTAUTH_SECRET` қойылмаған/өзгерген
 
-### Upload 503 (MinIO/S3)
-- `MINIO_*` параметрлері қате
-- Bucket жасалмаған (`npm run minio:init`)
+### Upload/Download қате (DB storage)
+- `DATABASE_URL` қате
+- DB лимиті/көлемі жетпейді
+- Prisma schema әлі қолданылмаған (`npm run db:push`)
 
 ### Prisma байланыс қатесі
 - `DATABASE_URL` қате

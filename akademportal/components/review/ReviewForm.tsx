@@ -67,7 +67,7 @@ export function ReviewForm({
       <div className="space-y-3">
         {CRITERIA.map(({ key, label }) => (
           <div key={key} className="flex items-center justify-between gap-4">
-            <span className="text-sm font-medium text-neutral-700">{label}</span>
+            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{label}</span>
             <StarRating
               value={Math.round(form.watch(key) ?? 0)}
               onChange={(v) => form.setValue(key, v, { shouldValidate: true })}
@@ -76,38 +76,38 @@ export function ReviewForm({
         ))}
       </div>
 
-      <div className="flex items-center justify-center gap-4 py-2 border-y border-neutral-100">
+      <div className="flex items-center justify-center gap-4 py-2 border-y border-neutral-100 dark:border-neutral-800">
         <ScoreRing score={overall} size={72} strokeWidth={4} />
         <div>
-          <div className="text-2xl font-bold text-neutral-900">{overall.toFixed(1)}</div>
-          <div className="text-xs text-neutral-500">орташа / 5.0</div>
+          <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{overall.toFixed(1)}</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">орташа / 5.0</div>
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium text-neutral-500">Күшті жақтары *</label>
+        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Күшті жақтары *</label>
         <textarea
-          className="w-full min-h-[88px] rounded-md border border-neutral-200 px-3 py-2 text-sm"
+          className="w-full min-h-[88px] rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           {...form.register("strengths")}
         />
       </div>
       <div className="space-y-2">
-        <label className="text-xs font-medium text-neutral-500">Ұсыныстар *</label>
+        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Ұсыныстар *</label>
         <textarea
-          className="w-full min-h-[88px] rounded-md border border-neutral-200 px-3 py-2 text-sm"
+          className="w-full min-h-[88px] rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           {...form.register("suggestions")}
         />
       </div>
       <div className="space-y-2">
-        <label className="text-xs font-medium text-neutral-500">Пікір (міндетті емес)</label>
+        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Пікір (міндетті емес)</label>
         <textarea
-          className="w-full min-h-[72px] rounded-md border border-neutral-200 px-3 py-2 text-sm"
+          className="w-full min-h-[72px] rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
           {...form.register("comment")}
         />
       </div>
 
       <div className="space-y-2">
-        <span className="text-xs font-medium text-neutral-500">Шешім *</span>
+        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Шешім *</span>
         <div className="grid grid-cols-1 gap-2">
           {(
             [
@@ -134,9 +134,9 @@ export function ReviewForm({
 
       {(decision === "RETURN" || decision === "REJECT") && (
         <div className="space-y-2">
-          <label className="text-xs font-medium text-neutral-500">Себебі *</label>
+          <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Себебі *</label>
           <textarea
-            className="w-full min-h-[80px] rounded-md border border-neutral-200 px-3 py-2 text-sm"
+            className="w-full min-h-[80px] rounded-md border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
             placeholder="Толтырыңыз…"
             {...form.register("returnReason")}
           />

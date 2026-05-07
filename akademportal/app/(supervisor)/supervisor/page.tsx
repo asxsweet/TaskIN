@@ -48,7 +48,7 @@ export default function SupervisorHomePage() {
         </div>
         {s.pendingCount > 0 ?
           <Link href="/supervisor/assigned">
-            <Button variant="secondary" className="bg-white text-blue-700 border-0">
+            <Button variant="secondary" className="bg-white text-blue-700 border-0 dark:bg-neutral-900 dark:text-blue-300">
               Тексеруге өту →
             </Button>
           </Link>
@@ -62,13 +62,13 @@ export default function SupervisorHomePage() {
           { label: "Орташа баллым", value: s.avgScore != null ? `${s.avgScore} ★` : "—", tone: "neutral" },
           { label: "Студенттерім", value: s.studentsCount, tone: "neutral" },
         ].map((c) => (
-          <div key={c.label} className="rounded-lg border border-neutral-200 bg-white p-5 shadow-xs">
-            <div className="text-xs text-neutral-500 mb-1">{c.label}</div>
+          <div key={c.label} className="rounded-lg border border-neutral-200 bg-white p-5 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="text-xs text-neutral-500 mb-1 dark:text-neutral-400">{c.label}</div>
             <div
               className={`text-2xl font-bold ${
                 c.tone === "amber" ? "text-amber-600"
                 : c.tone === "gray" ? "text-neutral-400"
-                : "text-neutral-900"
+                : "text-neutral-900 dark:text-neutral-100"
               }`}
             >
               {c.value}
@@ -98,12 +98,12 @@ export default function SupervisorHomePage() {
       : null}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="rounded-lg border border-neutral-200 bg-white p-6">
+        <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
           <h2 className="text-lg font-semibold mb-4">Соңғы бағалаулар</h2>
           <div className="overflow-x-auto text-sm">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-neutral-500 border-b">
+                <tr className="text-left text-neutral-500 border-b dark:text-neutral-400 dark:border-neutral-700">
                   <th className="pb-2">Студент</th>
                   <th className="pb-2">Тақырып</th>
                   <th className="pb-2">Балл</th>
@@ -112,7 +112,7 @@ export default function SupervisorHomePage() {
               </thead>
               <tbody>
                 {s.recentReviews.map((r) => (
-                  <tr key={r.id} className="border-b border-neutral-50">
+                  <tr key={r.id} className="border-b border-neutral-50 dark:border-neutral-800">
                     <td className="py-2">{r.studentName}</td>
                     <td className="py-2 max-w-[140px] truncate">{r.title}</td>
                     <td className="py-2">{r.score}</td>
@@ -123,7 +123,7 @@ export default function SupervisorHomePage() {
             </table>
           </div>
         </div>
-        <div className="rounded-lg border border-neutral-200 bg-white p-6">
+        <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-900">
           <h2 className="text-lg font-semibold mb-4">Белсенділік (30 күн)</h2>
           <ActivitySparkline points={s.activityLast30Days} />
         </div>

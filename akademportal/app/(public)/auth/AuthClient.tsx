@@ -185,8 +185,8 @@ export default function AuthClient() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-primary-dark p-12 flex-col justify-between relative overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white dark:bg-neutral-950">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-primary-dark p-10 xl:p-14 flex-col justify-between relative overflow-hidden">
         <div className="z-10">
           <Logo href="/" variant="inverse" />
         </div>
@@ -214,13 +214,13 @@ export default function AuthClient() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-24">
-        <div className="max-w-[400px] w-full mx-auto">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:py-16 lg:px-14 xl:px-20 2xl:px-28">
+        <div className="max-w-[440px] w-full mx-auto lg:max-w-[480px]">
           <div className="lg:hidden mb-12">
             <Logo href="/" />
           </div>
 
-          <div className="flex gap-8 border-b border-neutral-100 mb-8">
+          <div className="flex gap-8 border-b border-neutral-100 mb-8 dark:border-neutral-800">
             <button
               type="button"
               onClick={() => {
@@ -228,7 +228,7 @@ export default function AuthClient() {
                 setError(null);
               }}
               className={`pb-4 text-sm font-medium transition-all relative ${
-                tab === "login" ? "text-primary" : "text-neutral-400 hover:text-neutral-600"
+                tab === "login" ? "text-primary" : "text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
               }`}
             >
               Кіру
@@ -242,7 +242,7 @@ export default function AuthClient() {
                 setSupervisorSubmitted(false);
               }}
               className={`pb-4 text-sm font-medium transition-all relative ${
-                tab === "register" ? "text-primary" : "text-neutral-400 hover:text-neutral-600"
+                tab === "register" ? "text-primary" : "text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
               }`}
             >
               Тіркелу
@@ -253,8 +253,8 @@ export default function AuthClient() {
           {tab === "login" ?
             <form onSubmit={onLogin} className="space-y-6">
               <div>
-                <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Қош келдіңіз</h1>
-                <p className="text-sm text-neutral-500">Жұмысты жалғастыру үшін жүйеге кіріңіз</p>
+                <h1 className="text-2xl font-semibold text-neutral-900 mb-2 dark:text-neutral-100">Қош келдіңіз</h1>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">Жұмысты жалғастыру үшін жүйеге кіріңіз</p>
               </div>
               {error && (
                 <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -263,7 +263,7 @@ export default function AuthClient() {
               )}
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider dark:text-neutral-400">
                     Электрондық пошта
                   </label>
                   <Input
@@ -275,7 +275,7 @@ export default function AuthClient() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider dark:text-neutral-400">
                     Құпия сөз
                   </label>
                   <div className="relative">
@@ -290,7 +290,7 @@ export default function AuthClient() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300"
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -324,8 +324,8 @@ export default function AuthClient() {
             </div>
           : <form onSubmit={onRegister} className="space-y-6">
               <div>
-                <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Тіркелу</h1>
-                <p className="text-sm text-neutral-500">Жаңа аккаунт жасаңыз</p>
+                <h1 className="text-2xl font-semibold text-neutral-900 mb-2 dark:text-neutral-100">Тіркелу</h1>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">Жаңа аккаунт жасаңыз</p>
               </div>
               {error && (
                 <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -352,22 +352,22 @@ export default function AuthClient() {
                       type="button"
                       onClick={() => setRegisterRole("STUDENT")}
                       className={`rounded-xl border-2 p-4 text-left transition-all ${
-                        registerRole === "STUDENT" ? "border-blue-600 bg-blue-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"
+                        registerRole === "STUDENT" ? "border-blue-600 bg-blue-50 shadow-sm dark:bg-blue-500/20" : "border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600"
                       }`}
                     >
                       <div className="text-2xl mb-1">👨‍🎓</div>
-                      <div className="font-semibold text-neutral-900">Студент</div>
+                      <div className="font-semibold text-neutral-900 dark:text-neutral-100">Студент</div>
                       <p className="text-xs text-neutral-500 mt-1">Бірден кіре аласыз</p>
                     </button>
                     <button
                       type="button"
                       onClick={() => setRegisterRole("SUPERVISOR")}
                       className={`rounded-xl border-2 p-4 text-left transition-all ${
-                        registerRole === "SUPERVISOR" ? "border-blue-600 bg-blue-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"
+                        registerRole === "SUPERVISOR" ? "border-blue-600 bg-blue-50 shadow-sm dark:bg-blue-500/20" : "border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600"
                       }`}
                     >
                       <div className="text-2xl mb-1">👨‍🏫</div>
-                      <div className="font-semibold text-neutral-900">Жетекші</div>
+                      <div className="font-semibold text-neutral-900 dark:text-neutral-100">Жетекші</div>
                       <p className="text-xs text-neutral-500 mt-1">Өтінім жіберіледі</p>
                     </button>
                   </div>
@@ -404,7 +404,7 @@ export default function AuthClient() {
                   <div className="space-y-2">
                     <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Факультет</label>
                     <select
-                      className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60"
+                      className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                       value={facultyId}
                       onChange={(e) => setFacultyId(e.target.value)}
                       required
@@ -422,7 +422,7 @@ export default function AuthClient() {
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Факультет</label>
                       <select
-                        className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60"
+                        className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                         value={supervisorFacultyId}
                         onChange={(e) => {
                           setSupervisorFacultyId(e.target.value);
@@ -442,7 +442,7 @@ export default function AuthClient() {
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Кафедра</label>
                       <select
-                        className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60"
+                        className="flex h-10 w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25 disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                         value={departmentId}
                         onChange={(e) => setDepartmentId(e.target.value)}
                         required

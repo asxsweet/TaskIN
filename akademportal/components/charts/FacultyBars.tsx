@@ -13,10 +13,10 @@ export function FacultyBars({
       {rows.map((item) => (
         <div key={item.id} className="space-y-1.5">
           <div className="flex justify-between text-xs">
-            <span className="text-neutral-600">{item.name}</span>
-            <span className="font-bold text-neutral-900">{item.worksCount}</span>
+            <span className="text-neutral-600 dark:text-neutral-300">{item.name}</span>
+            <span className="font-bold text-neutral-900 dark:text-neutral-100">{item.worksCount}</span>
           </div>
-          <div className="h-2 w-full bg-neutral-100 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-neutral-100 rounded-full overflow-hidden dark:bg-neutral-800">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(item.worksCount / max) * 100}%` }}

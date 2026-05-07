@@ -131,7 +131,7 @@ export default function DashboardPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs flex flex-col justify-between"
+            className="bg-white p-6 rounded-lg border border-neutral-200 shadow-xs flex flex-col justify-between dark:border-neutral-700 dark:bg-neutral-900"
           >
             <div className="flex justify-between items-start mb-4">
               <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider">{stat.label}</span>
@@ -144,13 +144,13 @@ export default function DashboardPage() {
                 }
               />
             </div>
-            <span className="text-2xl font-bold text-neutral-900">{stat.value}</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{stat.value}</span>
           </div>
         ))}
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2 bg-white rounded-lg border border-neutral-200 shadow-xs p-6">
+        <section className="lg:col-span-2 bg-white rounded-lg border border-neutral-200 shadow-xs p-6 dark:border-neutral-700 dark:bg-neutral-900">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Соңғы жұмыстар</h2>
             <Link href="/my-works" className="text-sm text-primary hover:underline">
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-[11px] font-bold text-neutral-400 uppercase tracking-wider border-b border-neutral-100">
+                  <tr className="text-left text-[11px] font-bold text-neutral-400 uppercase tracking-wider border-b border-neutral-100 dark:border-neutral-700 dark:text-neutral-500">
                     <th className="pb-4 font-bold">Тақырып</th>
                     <th className="pb-4 font-bold">Түрі</th>
                     <th className="pb-4 font-bold">Статус</th>
@@ -178,9 +178,9 @@ export default function DashboardPage() {
                 </thead>
                 <tbody className="text-sm">
                   {stats.recentWorks.map((row) => (
-                    <tr key={row.id} className="border-b border-neutral-50 last:border-0 hover:bg-neutral-50">
-                      <td className="py-4 font-medium text-neutral-900 max-w-[180px] truncate">{row.title}</td>
-                      <td className="py-4 text-neutral-500">{workTypeLabel(row.type)}</td>
+                    <tr key={row.id} className="border-b border-neutral-50 last:border-0 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
+                      <td className="py-4 font-medium text-neutral-900 max-w-[180px] truncate dark:text-neutral-100">{row.title}</td>
+                      <td className="py-4 text-neutral-500 dark:text-neutral-400">{workTypeLabel(row.type)}</td>
                       <td className="py-4">
                         <Badge
                           variant={
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                           {workStatusLabel(row.status)}
                         </Badge>
                       </td>
-                      <td className="py-4 text-neutral-400 whitespace-nowrap">
+                      <td className="py-4 text-neutral-400 whitespace-nowrap dark:text-neutral-500">
                         {new Date(row.createdAt).toLocaleDateString("kk-KZ")}
                       </td>
                       <td className="py-4">
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                           Қарау
                         </Link>
                         {row.status === "PENDING" ?
-                          <Link href="/upload" className="text-neutral-500 text-xs">
+                          <Link href="/upload" className="text-neutral-500 text-xs dark:text-neutral-400">
                             Өңдеу
                           </Link>
                         : null}
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.recommendedWorks.length === 0 ?
-            <p className="text-sm text-neutral-500 col-span-full">Ұсыныстар әлі жоқ — іздеуден қараңыз.</p>
+            <p className="text-sm text-neutral-500 col-span-full dark:text-neutral-400">Ұсыныстар әлі жоқ — іздеуден қараңыз.</p>
           : null}
           {stats.recommendedWorks.map((w) => (
             <WorkCard

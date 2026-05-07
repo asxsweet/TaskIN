@@ -5,6 +5,7 @@ import { reviewCreateSchema } from "@/lib/validations";
 import { indexWork } from "@/lib/elasticsearch";
 import { notifyNewReview, notifyWorkStatus } from "@/lib/email";
 import { notifyUser } from "@/lib/notifications";
+import { sanitizeText } from "@/lib/security";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -76,11 +77,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           formatting: data.formatting,
           conclusion: data.conclusion,
           overallScore: overall,
-          strengths: data.strengths,
-          suggestions: data.suggestions,
-          comment: data.comment,
+          strengths: sanitizeText(data.strengths),
+          suggestions: sanitizeText(data.suggestions),
+          comment: sanitizeText(data.comment),
           decision,
-          returnReason: data.returnReason ?? null,
+          returnReason: data.returnReason ? sanitizeText(data.returnReason) : null,
         },
       }),
       prisma.work.update({

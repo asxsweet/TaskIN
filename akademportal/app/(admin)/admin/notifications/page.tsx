@@ -44,12 +44,12 @@ export default function AdminNotificationsPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <h1 className="text-xl font-semibold">Хабарландырулар</h1>
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white dark:divide-neutral-800 dark:border-neutral-700 dark:bg-neutral-900">
         {items.map((n) => (
           <li key={n.id}>
             <button
               type="button"
-              className="w-full text-left p-4 hover:bg-neutral-50 flex gap-3 items-start"
+              className="w-full text-left p-4 hover:bg-neutral-50 flex gap-3 items-start dark:hover:bg-neutral-800"
               onClick={() => openRow(n)}
             >
               <Icon type={n.type} />
@@ -58,8 +58,8 @@ export default function AdminNotificationsPage() {
                   {n.title}
                   {!n.read && <span className="h-2 w-2 rounded-full bg-red-500 shrink-0" />}
                 </div>
-                {n.body ? <p className="text-sm text-neutral-600 mt-1">{n.body}</p> : null}
-                <p className="text-xs text-neutral-400 mt-2">{new Date(n.createdAt).toLocaleString("kk-KZ")}</p>
+                {n.body ? <p className="text-sm text-neutral-600 mt-1 dark:text-neutral-400">{n.body}</p> : null}
+                <p className="text-xs text-neutral-400 mt-2 dark:text-neutral-500">{new Date(n.createdAt).toLocaleString("kk-KZ")}</p>
               </div>
             </button>
           </li>

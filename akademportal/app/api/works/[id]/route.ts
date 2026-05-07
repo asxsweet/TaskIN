@@ -68,9 +68,9 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         status: work.status,
         viewCount: work.viewCount,
         fileSize: work.fileSize,
+        fileMimeType: work.fileMimeType,
         pageCount: work.pageCount,
         plagiarismScore: work.plagiarismScore,
-        filePath: work.filePath,
         createdAt: work.createdAt.toISOString(),
         updatedAt: work.updatedAt.toISOString(),
         author: {

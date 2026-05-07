@@ -139,7 +139,12 @@ export type SearchParams = {
   facultyId?: string;
   facultyIds?: string[];
   year?: number;
+  yearFrom?: number;
+  yearTo?: number;
   lang?: string;
+  departmentId?: string;
+  supervisorId?: string;
+  status?: string;
   sort?: string;
   page?: number;
   pageSize?: number;
@@ -155,103 +160,122 @@ export async function searchWorks(params: SearchParams) {
     return prismaSearchFallback(params, page, pageSize);
   }
 
-  const must: object[] = [{ term: { status: "APPROVED" } }];
-  const filter: object[] = [];
+  try {
+    const must: object[] = [{ term: { status: params.status ?? "APPROVED" } }];
+    const filter: object[] = [];
 
-  if (params.q?.trim()) {
-    must.push({
-      multi_match: {
-        query: params.q.trim(),
-        fields: ["title^3", "abstract", "keywords"],
-        type: "best_fields",
-        fuzziness: "AUTO",
-      },
-    });
-  }
-  if (params.types?.length) filter.push({ terms: { type: params.types } });
-  else if (params.type) filter.push({ term: { type: params.type } });
-  if (params.facultyIds?.length) filter.push({ terms: { facultyId: params.facultyIds } });
-  else if (params.facultyId) filter.push({ term: { facultyId: params.facultyId } });
-  if (params.year) filter.push({ term: { year: params.year } });
-  if (params.lang) filter.push({ term: { language: params.lang } });
-
-  let sortClause: object[] = [{ _score: "desc" }];
-  if (params.sort === "date") sortClause = [{ createdAt: "desc" }];
-  else if (params.sort === "downloads") sortClause = [{ downloadCount: "desc" }];
-  else if (params.sort === "rating") sortClause = [{ avgRating: "desc" }];
-
-  const body = {
-    query: { bool: { must, filter } },
-    sort: sortClause,
-    from,
-    size: pageSize,
-    highlight:
-      params.q?.trim() ?
-        {
-          fields: {
-            title: {},
-            abstract: { fragment_size: 180, number_of_fragments: 2 },
-            keywords: {},
+    if (params.q?.trim()) {
+      must.push({
+        multi_match: {
+          query: params.q.trim(),
+          fields: ["title^3", "abstract", "keywords"],
+          type: "best_fields",
+          fuzziness: "AUTO",
+        },
+      });
+    }
+    if (params.types?.length) filter.push({ terms: { type: params.types } });
+    else if (params.type) filter.push({ term: { type: params.type } });
+    if (params.facultyIds?.length) filter.push({ terms: { facultyId: params.facultyIds } });
+    else if (params.facultyId) filter.push({ term: { facultyId: params.facultyId } });
+    if (params.year) filter.push({ term: { year: params.year } });
+    if (params.yearFrom || params.yearTo) {
+      filter.push({
+        range: {
+          year: {
+            ...(params.yearFrom ? { gte: params.yearFrom } : {}),
+            ...(params.yearTo ? { lte: params.yearTo } : {}),
           },
-        }
-      : undefined,
-    aggs: {
-      byType: { terms: { field: "type", size: 20 } },
-      byFaculty: { terms: { field: "facultyId", size: 50 } },
-      byYear: { terms: { field: "year", size: 30 } },
-      byLang: { terms: { field: "language", size: 10 } },
-    },
-  };
+        },
+      });
+    }
+    if (params.lang) filter.push({ term: { language: params.lang } });
+    if (params.departmentId) filter.push({ term: { departmentId: params.departmentId } });
 
-  const res = await client.search({
-    index: INDEX,
-    body: body as never,
-    track_total_hits: true,
-  });
+    let sortClause: object[] = [{ _score: "desc" }];
+    if (params.sort === "date") sortClause = [{ createdAt: "desc" }];
+    else if (params.sort === "downloads") sortClause = [{ downloadCount: "desc" }];
+    else if (params.sort === "rating") sortClause = [{ avgRating: "desc" }];
 
-  const total =
-    typeof res.hits.total === "number" ? res.hits.total : res.hits.total?.value ?? 0;
-  const hits = res.hits.hits.map((h) => {
-    const src = h._source as WorkDoc;
-    const hl = h.highlight as Record<string, string[]> | undefined;
-    return {
-      id: src.id,
-      title: src.title,
-      abstract: src.abstract,
-      type: src.type,
-      year: src.year,
-      language: src.language,
-      viewCount: src.viewCount,
-      downloads: src.downloadCount,
-      authorName: src.authorName,
-      facultyName: src.facultyName,
-      supervisorName: null as string | null,
-      keywords: src.keywords,
-      createdAt: src.createdAt,
-      highlight: hl ?
+    const body = {
+      query: { bool: { must, filter } },
+      sort: sortClause,
+      from,
+      size: pageSize,
+      highlight:
+        params.q?.trim() ?
           {
-            title: hl.title,
-            abstract: hl.abstract,
-            keywords: hl.keywords,
+            fields: {
+              title: {},
+              abstract: { fragment_size: 180, number_of_fragments: 2 },
+              keywords: {},
+            },
           }
         : undefined,
+      aggs: {
+        byType: { terms: { field: "type", size: 20 } },
+        byFaculty: { terms: { field: "facultyId", size: 50 } },
+        byYear: { terms: { field: "year", size: 30 } },
+        byLang: { terms: { field: "language", size: 10 } },
+      },
     };
-  });
 
-  const aggs = res.aggregations as Record<string, { buckets: { key: string | number; doc_count: number }[] }>;
+    const res = await client.search({
+      index: INDEX,
+      body: body as never,
+      track_total_hits: true,
+    });
 
-  return {
-    total,
-    page,
-    pageSize,
-    hits,
-    aggregations: {
-      types: aggs?.byType?.buckets ?? [],
-      faculties: aggs?.byFaculty?.buckets ?? [],
-      years: aggs?.byYear?.buckets ?? [],
-      languages: aggs?.byLang?.buckets ?? [],
-    },
-  };
+    const total =
+      typeof res.hits.total === "number" ? res.hits.total : res.hits.total?.value ?? 0;
+    const hits = res.hits.hits.map((h) => {
+      const src = h._source as WorkDoc;
+      const hl = h.highlight as Record<string, string[]> | undefined;
+      return {
+        id: src.id,
+        title: src.title,
+        abstract: src.abstract,
+        type: src.type,
+        year: src.year,
+        language: src.language,
+        viewCount: src.viewCount,
+        downloads: src.downloadCount,
+        authorName: src.authorName,
+        facultyName: src.facultyName,
+        supervisorName: null as string | null,
+        keywords: src.keywords,
+        createdAt: src.createdAt,
+        highlight: hl ?
+            {
+              title: hl.title,
+              abstract: hl.abstract,
+              keywords: hl.keywords,
+            }
+          : undefined,
+      };
+    });
+
+    const aggs = res.aggregations as Record<
+      string,
+      { buckets: { key: string | number; doc_count: number }[] }
+    >;
+
+    return {
+      total,
+      page,
+      pageSize,
+      hits,
+      aggregations: {
+        types: aggs?.byType?.buckets ?? [],
+        faculties: aggs?.byFaculty?.buckets ?? [],
+        years: aggs?.byYear?.buckets ?? [],
+        languages: aggs?.byLang?.buckets ?? [],
+      },
+    };
+  } catch (err) {
+    console.warn("[elasticsearch] search failed, using DB fallback:", err);
+    return prismaSearchFallback(params, page, pageSize);
+  }
 }
 
 async function prismaSearchFallback(params: SearchParams, page: number, pageSize: number) {
@@ -267,7 +291,16 @@ async function prismaSearchFallback(params: SearchParams, page: number, pageSize
     where.department = { facultyId: params.facultyId };
   }
   if (params.year) where.year = params.year;
+  if (params.yearFrom || params.yearTo) {
+    where.year = {
+      ...(params.yearFrom ? { gte: params.yearFrom } : {}),
+      ...(params.yearTo ? { lte: params.yearTo } : {}),
+    };
+  }
   if (params.lang) where.language = params.lang as never;
+  if (params.departmentId) where.departmentId = params.departmentId;
+  if (params.supervisorId) where.supervisorId = params.supervisorId;
+  if (params.status) where.status = params.status as never;
   if (params.q?.trim()) {
     const q = params.q.trim();
     where.OR = [

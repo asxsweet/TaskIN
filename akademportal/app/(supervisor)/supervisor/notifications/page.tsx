@@ -45,21 +45,21 @@ export default function SupervisorNotificationsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Хабарландырулар</h1>
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white">
+      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white dark:divide-neutral-800 dark:border-neutral-700 dark:bg-neutral-900">
         {items.map((n) => (
           <li key={n.id}>
             <button
               type="button"
               onClick={() => onOpen(n)}
               className={`w-full text-left p-4 flex gap-3 items-start transition-colors ${
-                n.read ? "bg-white" : "bg-blue-50/50"
-              } hover:bg-neutral-50`}
+                n.read ? "bg-white dark:bg-neutral-900" : "bg-blue-50/50 dark:bg-blue-500/10"
+              } hover:bg-neutral-50 dark:hover:bg-neutral-800`}
             >
               <RowIcon type={n.type} />
               <div className="min-w-0 flex-1">
-                <div className={`font-medium ${n.read ? "text-neutral-700" : "text-neutral-900"}`}>{n.title}</div>
-                {n.body ? <p className="text-sm text-neutral-600 mt-1">{n.body}</p> : null}
-                <p className="text-xs text-neutral-400 mt-2">{new Date(n.createdAt).toLocaleString("kk-KZ")}</p>
+                <div className={`font-medium ${n.read ? "text-neutral-700 dark:text-neutral-300" : "text-neutral-900 dark:text-neutral-100"}`}>{n.title}</div>
+                {n.body ? <p className="text-sm text-neutral-600 mt-1 dark:text-neutral-400">{n.body}</p> : null}
+                <p className="text-xs text-neutral-400 mt-2 dark:text-neutral-500">{new Date(n.createdAt).toLocaleString("kk-KZ")}</p>
               </div>
               {!n.read ?
                 <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-2" />

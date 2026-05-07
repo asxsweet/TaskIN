@@ -36,10 +36,10 @@ export default function SupervisorStudentsPage() {
       : null}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {items.map((s) => (
-          <div key={s.id} className="rounded-lg border border-neutral-200 bg-white p-4 space-y-2">
+          <div key={s.id} className="rounded-lg border border-neutral-200 bg-white p-4 space-y-2 dark:border-neutral-700 dark:bg-neutral-900">
             <div className="font-semibold">{s.name}</div>
-            <div className="text-xs text-neutral-500">{s.email}</div>
-            <div className="text-xs inline-block rounded-full bg-neutral-100 px-2 py-0.5">{s.facultyName ?? "—"}</div>
+            <div className="text-xs text-neutral-500 dark:text-neutral-400">{s.email}</div>
+            <div className="text-xs inline-block rounded-full bg-neutral-100 px-2 py-0.5 dark:bg-neutral-800 dark:text-neutral-300">{s.facultyName ?? "—"}</div>
             <div className="text-sm">
               Жұмыс: {s.worksCount} · Орташа: {s.avgScore ?? "—"}
             </div>

@@ -12,6 +12,7 @@ export async function getUserFromRequest(req: NextRequest): Promise<User | null>
     try {
       const payload = verifyAccessToken(token);
       const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+      if (!user || user.deletedAt || user.isLocked) return null;
       return user;
     } catch {
       return null;
@@ -21,7 +22,9 @@ export async function getUserFromRequest(req: NextRequest): Promise<User | null>
   const session = await getServerSession(authOptions);
   const id = session?.user?.id;
   if (!id) return null;
-  return prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user || user.deletedAt || user.isLocked) return null;
+  return user;
 }
 
 export async function requireUser(req: NextRequest): Promise<User> {

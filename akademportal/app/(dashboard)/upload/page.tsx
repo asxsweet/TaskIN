@@ -84,7 +84,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto -m-4 md:-m-8 px-4 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto -m-4 md:-m-6 lg:-m-8 px-4 md:px-6 lg:px-8 py-8 space-y-8">
       <StepIndicator step={step} />
       {msg && <Toast variant={msg.includes("Сәтті") ? "success" : "error"}>{msg}</Toast>}
 
@@ -92,7 +92,7 @@ export default function UploadPage() {
         <div className="space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-semibold">Жұмысты жүктеу</h1>
-            <p className="text-neutral-500">Алдымен файлды таңдаңыз (PDF немесе DOCX)</p>
+            <p className="text-neutral-500 dark:text-neutral-400">Алдымен файлды таңдаңыз (PDF немесе DOCX)</p>
           </div>
           <UploadDropzone file={file} onFile={setFile} />
           <div className="flex justify-end">
@@ -120,19 +120,19 @@ export default function UploadPage() {
             </div>
           : null}
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Тақырып</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Тақырып</label>
             <Input {...form.register("title")} />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Аннотация</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Аннотация</label>
             <textarea
-              className="flex min-h-[120px] w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm"
+              className="flex min-h-[120px] w-full rounded-sm border border-neutral-200 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
               {...form.register("abstract")}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-neutral-500">Түрі</label>
+              <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Түрі</label>
               <Select {...form.register("type")}>
                 <option value="DIPLOMA">Диплом</option>
                 <option value="COURSE">Курстық</option>
@@ -142,12 +142,12 @@ export default function UploadPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium text-neutral-500">Жыл</label>
+              <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Жыл</label>
               <Input type="number" {...form.register("year", { valueAsNumber: true })} />
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Тіл</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Тіл</label>
             <Select {...form.register("language")}>
               <option value="KAZAKH">Қазақша</option>
               <option value="RUSSIAN">Орысша</option>
@@ -155,7 +155,7 @@ export default function UploadPage() {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Кафедра</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Кафедра</label>
             <Select {...form.register("departmentId")}>
               <option value="">—</option>
               {faculties.flatMap((f) =>
@@ -171,7 +171,7 @@ export default function UploadPage() {
             : null}
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Жетекші</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Жетекші</label>
             <Select
               {...form.register("supervisorId", {
                 setValueAs: (v) => (typeof v === "string" && v === "" ? undefined : v),
@@ -186,7 +186,7 @@ export default function UploadPage() {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500">Кілт сөздер</label>
+            <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Кілт сөздер</label>
             <TagInput
               value={form.watch("keywordNames") ?? []}
               onChange={(v) => form.setValue("keywordNames", v)}
@@ -206,7 +206,7 @@ export default function UploadPage() {
       {step === 3 && (
         <div className="text-center space-y-4">
           <h2 className="text-xl font-semibold">Рахмет!</h2>
-          <p className="text-neutral-600">Жұмысыңыз тексеруге жіберілді.</p>
+          <p className="text-neutral-600 dark:text-neutral-400">Жұмысыңыз тексеруге жіберілді.</p>
         </div>
       )}
     </div>

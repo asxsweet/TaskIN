@@ -98,6 +98,24 @@ export const reviewCreateSchema = z
 
 export const userUpdateSchema = z.object({
   name: z.string().min(2).max(120).optional(),
-  avatar: z.string().url().optional().nullable(),
-  facultyId: z.string().cuid().optional(),
+  avatar: z
+    .string()
+    .max(2_000_000)
+    .refine(
+      (v) =>
+        v.startsWith("http://") ||
+        v.startsWith("https://") ||
+        v.startsWith("data:image/"),
+      "Аватар URL немесе сурет (data:image) болуы керек"
+    )
+    .optional()
+    .nullable(),
+  facultyId: optionalId,
+  departmentId: optionalId,
+  employeeId: z.string().trim().max(64).optional().nullable(),
+  phone: z.string().trim().max(32).optional().nullable(),
+  position: z.string().trim().max(200).optional().nullable(),
+  bio: z.string().trim().max(2000).optional().nullable(),
+  socialLinks: z.string().trim().max(4000).optional().nullable(),
+  interests: z.string().trim().max(2000).optional().nullable(),
 });

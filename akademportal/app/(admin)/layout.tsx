@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const MAIN = [
   { href: "/admin", label: "Шолу", icon: LayoutDashboard },
@@ -37,10 +38,28 @@ const SYSTEM = [
   { href: "/admin/settings", label: "Баптаулар", icon: Settings },
 ];
 
+function adminSectionTitle(pathname: string | null) {
+  const p = pathname || "";
+  if (p.startsWith("/admin/review/")) return "Жұмысты қарау";
+  if (p.startsWith("/admin/notifications")) return "Хабарландырулар";
+  if (p.startsWith("/admin/approvals")) return "Жетекші өтінімдері";
+  if (p.startsWith("/admin/faculties")) return "Факультеттер";
+  if (p.startsWith("/admin/departments")) return "Кафедралар";
+  if (p.startsWith("/admin/works")) return "Барлық жұмыстар";
+  if (p.startsWith("/admin/users")) return "Пайдаланушылар";
+  if (p.startsWith("/admin/ratings")) return "Бағалаулар";
+  if (p.startsWith("/admin/reports")) return "Есептер";
+  if (p.startsWith("/admin/settings")) return "Баптаулар";
+  if (p === "/admin" || p === "/admin/") return "Шолу";
+  if (p.startsWith("/admin/")) return "Басқару";
+  return "Шолу";
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data } = useSession();
   const [pendingApprovals, setPendingApprovals] = useState(0);
+  const adminTitle = useMemo(() => adminSectionTitle(pathname), [pathname]);
 
   useEffect(() => {
     fetch("/api/admin/approvals?filter=pending", { credentials: "include" })
@@ -56,13 +75,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
-      <aside className="hidden md:flex w-[260px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0">
+    <div className="flex min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <aside className="hidden md:flex w-[260px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="p-6">
           <Logo href="/" />
         </div>
         <div className="px-4 mb-4">
-          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100">
+          <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 dark:border-neutral-800 dark:bg-neutral-800">
             <Avatar
               initials={data?.user?.name
                 ?.split(" ")
@@ -96,8 +115,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={l.href}
                     href={l.href}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium",
-                      active ? "bg-red-50 text-red-900 border-l-2 border-red-600" : "text-neutral-600 hover:bg-neutral-50"
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium border-l-2",
+                      active ?
+                        "bg-red-50 text-red-900 border-red-600"
+                      : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                     )}
                   >
                     <l.icon size={18} />
@@ -118,8 +139,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={l.href}
                     href={l.href}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium",
-                      active ? "bg-neutral-100 text-neutral-900" : "text-neutral-600 hover:bg-neutral-50"
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium border-l-2",
+                      active ?
+                        "bg-neutral-100 text-neutral-900 border-neutral-400"
+                      : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                     )}
                   >
                     <l.icon size={18} />
@@ -130,7 +153,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:bg-neutral-50 border-l-2 border-transparent"
               >
                 <LogOut size={18} />
                 Шығу
@@ -140,14 +163,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-8 sticky top-0 z-40">
-          <div className="text-sm text-neutral-500">
-            Әкімші панель <span className="text-neutral-300">/</span>{" "}
-            <span className="text-neutral-900 font-medium">Басқару</span>
+        <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-6 lg:px-8 sticky top-0 z-40 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="text-sm text-neutral-500 min-w-0 truncate pr-4">
+            <span className="text-neutral-500 dark:text-neutral-400">Әкімші панель</span>{" "}
+            <span className="text-neutral-300 dark:text-neutral-600">/</span>{" "}
+            <span className="text-neutral-900 font-medium dark:text-neutral-100">{adminTitle}</span>
           </div>
-          <NotificationBell variant="compact" />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <NotificationBell variant="compact" />
+          </div>
         </header>
-        <main className="p-4 md:p-8 flex-1">{children}</main>
+        <main className="p-4 md:p-6 lg:p-8 flex-1 min-w-0">{children}</main>
       </div>
     </div>
   );

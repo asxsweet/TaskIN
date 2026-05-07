@@ -44,7 +44,7 @@ export function StudentSidebar() {
   }, [pathname]);
 
   return (
-    <aside className="hidden md:flex w-[240px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0">
+    <aside className="hidden md:flex w-[260px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0 dark:border-neutral-800 dark:bg-neutral-900">
       <div className="p-6">
         <Logo href="/" />
       </div>
@@ -53,7 +53,7 @@ export function StudentSidebar() {
         <Link
           href="/profile"
           className={cn(
-            "flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 transition-all hover:bg-neutral-100 hover:border-neutral-200",
+            "flex items-center gap-3 p-3 bg-neutral-50 rounded-lg border border-neutral-100 transition-all hover:bg-neutral-100 hover:border-neutral-200 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
             pathname === "/profile" && "ring-2 ring-blue-500/30 border-blue-200 bg-blue-50/50"
           )}
         >
@@ -66,7 +66,7 @@ export function StudentSidebar() {
             size="md"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-semibold text-neutral-900 truncate">{user?.name}</span>
+            <span className="text-xs font-semibold text-neutral-900 truncate dark:text-neutral-100">{user?.name}</span>
             <span className="mt-1 inline-flex w-fit rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold text-white">
               Студент
             </span>
@@ -87,10 +87,10 @@ export function StudentSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center justify-between px-3 py-2 rounded-md transition-all",
+                    "flex items-center justify-between px-3 py-2 rounded-md transition-all border-l-2",
                     active ?
-                      "bg-blue-50 text-blue-700 border-l-2 border-blue-600"
-                    : "text-neutral-600 hover:bg-neutral-50"
+                      "bg-blue-50 text-blue-700 border-blue-600"
+                    : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -120,10 +120,10 @@ export function StudentSidebar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center px-3 py-2 rounded-md transition-all",
+                    "flex items-center px-3 py-2 rounded-md transition-all border-l-2",
                     active ?
-                      "bg-blue-50 text-blue-700 border-l-2 border-blue-600"
-                    : "text-neutral-600 hover:bg-neutral-50"
+                      "bg-blue-50 text-blue-700 border-blue-600"
+                    : "text-neutral-600 hover:bg-neutral-50 border-transparent"
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -143,8 +143,10 @@ export function StudentSidebar() {
           <Link
             href="/settings"
             className={cn(
-              "flex items-center px-3 py-2 rounded-md text-neutral-600 hover:bg-neutral-50",
-              pathname === "/settings" && "bg-blue-50 text-blue-700 border-l-2 border-blue-600"
+              "flex items-center px-3 py-2 rounded-md border-l-2 text-neutral-600 hover:bg-neutral-50",
+              pathname === "/settings" ?
+                "bg-blue-50 text-blue-700 border-blue-600"
+              : "border-transparent"
             )}
           >
             <Settings size={18} className="mr-3" />

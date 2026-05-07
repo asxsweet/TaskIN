@@ -20,7 +20,7 @@ export function WorkTable({ rows }: { rows: WorkTableRow[] }) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 border-b border-neutral-100">
+          <tr className="text-left text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 border-b border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-500">
             <th className="px-6 py-4">Тақырып</th>
             <th className="px-6 py-4">Автор</th>
             <th className="px-6 py-4">Факультет</th>
@@ -31,14 +31,14 @@ export function WorkTable({ rows }: { rows: WorkTableRow[] }) {
         </thead>
         <tbody className="text-sm">
           {rows.map((row) => (
-            <tr key={row.id} className="border-b border-neutral-50 hover:bg-neutral-50">
+            <tr key={row.id} className="border-b border-neutral-50 hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
               <td className="px-6 py-4">
                 <Link href={`/works/${row.id}`} className="font-medium text-primary hover:underline">
                   {row.title}
                 </Link>
               </td>
               <td className="px-6 py-4">{row.author}</td>
-              <td className="px-6 py-4 text-neutral-500">{row.faculty}</td>
+              <td className="px-6 py-4 text-neutral-500 dark:text-neutral-400">{row.faculty}</td>
               <td className="px-6 py-4">{workTypeLabel(row.type)}</td>
               <td className="px-6 py-4">
                 <Badge
@@ -51,7 +51,7 @@ export function WorkTable({ rows }: { rows: WorkTableRow[] }) {
                   {workStatusLabel(row.status)}
                 </Badge>
               </td>
-              <td className="px-6 py-4 text-neutral-400">
+              <td className="px-6 py-4 text-neutral-400 dark:text-neutral-500">
                 {new Date(row.createdAt).toLocaleDateString("kk-KZ")}
               </td>
             </tr>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { StudentProfileView } from "@/components/profile/StudentProfileView";
+import { Toast } from "@/components/ui/Toast";
 
 type StudentPayload = {
   profile: {
@@ -36,6 +37,8 @@ type StudentPayload = {
 export default function StudentProfilePage() {
   const [data, setData] = useState<StudentPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [avatarBusy, setAvatarBusy] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +61,45 @@ export default function StudentProfilePage() {
     };
   }, []);
 
+  async function onAvatarPick(file?: File) {
+    if (!file || !data) return;
+    setAvatarBusy(true);
+    if (!file.type.startsWith("image/")) {
+      setMsg("Тек сурет файлын таңдаңыз");
+      setAvatarBusy(false);
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      setMsg("Аватар 1MB-тан аспауы керек");
+      setAvatarBusy(false);
+      return;
+    }
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Файл оқу қате"));
+      reader.readAsDataURL(file);
+    }).catch(() => "");
+    if (!dataUrl) {
+      setAvatarBusy(false);
+      return;
+    }
+    const r = await fetch(`/api/users/${data.profile.id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ avatar: dataUrl }),
+    });
+    if (!r.ok) {
+      setMsg("Аватар сақтау сәтсіз");
+      setAvatarBusy(false);
+      return;
+    }
+    setData((prev) => (prev ? { ...prev, profile: { ...prev.profile, avatar: dataUrl } } : prev));
+    setMsg("Аватар жаңартылды");
+    setAvatarBusy(false);
+  }
+
   if (error) {
     return (
       <div className="max-w-xl mx-auto py-12 text-center text-neutral-600">
@@ -74,5 +116,16 @@ export default function StudentProfilePage() {
     );
   }
 
-  return <StudentProfileView profile={data.profile} stats={data.stats} recentWorks={data.recentWorks} />;
+  return (
+    <div className="space-y-4">
+      {msg ? <Toast variant={msg.includes("сәтсіз") ? "error" : "success"}>{msg}</Toast> : null}
+      <StudentProfileView
+        profile={data.profile}
+        stats={data.stats}
+        recentWorks={data.recentWorks}
+        onAvatarPick={onAvatarPick}
+        avatarBusy={avatarBusy}
+      />
+    </div>
+  );
 }

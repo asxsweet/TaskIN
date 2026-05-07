@@ -27,6 +27,7 @@ type WorkDetailPayload = {
     status: string;
     viewCount: number;
     pageCount: number | null;
+    fileMimeType: string | null;
     plagiarismScore: number | null;
     author: { name: string };
     faculty: { name: string };
@@ -64,32 +65,48 @@ export default function WorkDetailPage() {
   const id = String(params.id);
   const { data: session } = useSession();
   const [data, setData] = useState<WorkDetailPayload | null>(null);
+  const [folders, setFolders] = useState<{ id: string; name: string }[]>([]);
+  const [folderId, setFolderId] = useState<string>("");
+  const [bookmarkMsg, setBookmarkMsg] = useState<string>("");
 
   useEffect(() => {
     apiJsonSafe<WorkDetailPayload | null>(`/api/works/${id}`, null).then(setData);
     fetch(`/api/works/${id}/view`, { method: "POST", credentials: "include" }).catch(() => undefined);
+    apiJsonSafe<{ folders?: { id: string; name: string }[] }>("/api/bookmarks", { folders: [] }).then((d) =>
+      setFolders(d.folders ?? [])
+    );
   }, [id]);
 
   async function download() {
-    const j = await apiJsonSafe<{ url?: string }>(`/api/works/${id}/download`, {});
-    if (j.url) window.open(j.url, "_blank");
+    window.open(`/api/works/${id}/download`, "_blank");
   }
 
   async function toggleBookmark() {
-    await fetch(`/api/bookmarks/${id}`, { method: "POST", credentials: "include" });
+    const r = await fetch(`/api/bookmarks/${id}`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ folderId: folderId || null }),
+    });
+    if (!r.ok) {
+      setBookmarkMsg("Бетбелгіге қосу сәтсіз");
+      return;
+    }
+    const j = (await r.json()) as { bookmarked?: boolean };
+    setBookmarkMsg(j.bookmarked ? "Бетбелгіге қосылды" : "Бетбелгіден алынды");
   }
 
   if (!data) return <div className="text-neutral-500">Жүктелуде…</div>;
   const w = data.work;
 
   return (
-    <div className="max-w-7xl mx-auto -m-4 md:-m-8 px-4 md:px-8 py-8">
+    <div className="max-w-7xl mx-auto -m-4 md:-m-6 lg:-m-8 px-4 md:px-6 lg:px-8 py-8">
       <nav className="flex items-center gap-2 text-sm text-neutral-500 mb-12 flex-wrap">
         <Link href="/search" className="hover:text-primary">
           Іздеу
         </Link>
         <ChevronRight size={14} />
-        <span className="text-neutral-900 font-medium line-clamp-1">{w.title}</span>
+        <span className="text-neutral-900 font-medium line-clamp-1 dark:text-neutral-100">{w.title}</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-12">
@@ -100,8 +117,8 @@ export default function WorkDetailPage() {
               <Badge variant="approved">{workStatusLabel(w.status as never)}</Badge>
               <PlagiarismBadge score={w.plagiarismScore} />
             </div>
-            <h1 className="font-display text-4xl lg:text-5xl text-neutral-900 leading-tight">{w.title}</h1>
-            <div className="flex items-center gap-4 py-4 border-y border-neutral-100">
+            <h1 className="font-display text-4xl lg:text-5xl text-neutral-900 leading-tight dark:text-neutral-100">{w.title}</h1>
+            <div className="flex items-center gap-4 py-4 border-y border-neutral-100 dark:border-neutral-800">
               <Avatar
                 initials={w.author.name
                   .split(" ")
@@ -111,25 +128,25 @@ export default function WorkDetailPage() {
                 size="lg"
               />
               <div>
-                <div className="font-semibold text-neutral-900">{w.author.name}</div>
-                <div className="text-sm text-neutral-500">
+                <div className="font-semibold text-neutral-900 dark:text-neutral-100">{w.author.name}</div>
+                <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   Ғылыми жетекші: {w.supervisor?.name ?? "—"}
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-6 text-sm text-neutral-600">
+            <div className="flex flex-wrap gap-6 text-sm text-neutral-600 dark:text-neutral-300">
               <div className="flex items-center gap-2">
-                <Calendar size={16} className="text-neutral-400" /> {w.year}
+                <Calendar size={16} className="text-neutral-400 dark:text-neutral-500" /> {w.year}
               </div>
               <div className="flex items-center gap-2">
-                <Landmark size={16} className="text-neutral-400" /> {w.faculty.name}
+                <Landmark size={16} className="text-neutral-400 dark:text-neutral-500" /> {w.faculty.name}
               </div>
               <div className="flex items-center gap-2">
-                <Globe size={16} className="text-neutral-400" /> {languageLabel(w.language as never)}
+                <Globe size={16} className="text-neutral-400 dark:text-neutral-500" /> {languageLabel(w.language as never)}
               </div>
               {w.pageCount && (
                 <div className="flex items-center gap-2">
-                  <BookOpen size={16} className="text-neutral-400" /> {w.pageCount} бет
+                  <BookOpen size={16} className="text-neutral-400 dark:text-neutral-500" /> {w.pageCount} бет
                 </div>
               )}
             </div>
@@ -143,23 +160,46 @@ export default function WorkDetailPage() {
           </div>
 
           <div className="prose prose-neutral max-w-none">
-            <p className="text-neutral-700 leading-relaxed whitespace-pre-wrap">{w.abstract}</p>
+            <p className="text-neutral-700 leading-relaxed whitespace-pre-wrap dark:text-neutral-300">{w.abstract}</p>
           </div>
+
+          {w.fileMimeType === "application/pdf" && (
+            <div className="rounded-xl border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900">
+              <iframe
+                title="PDF preview"
+                src={`/api/works/${id}/preview`}
+                className="h-[70vh] w-full rounded-md"
+              />
+            </div>
+          )}
 
           <div className="flex gap-3 flex-wrap">
             <Button className="gap-2" type="button" onClick={download}>
               <Download size={18} /> Жүктеу
             </Button>
+            <select
+              value={folderId}
+              onChange={(e) => setFolderId(e.target.value)}
+              className="h-10 rounded-md border border-neutral-200 bg-white px-3 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+            >
+              <option value="">Папкасыз</option>
+              {folders.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
             <Button variant="secondary" type="button" className="gap-2" onClick={toggleBookmark}>
               <Bookmark size={18} /> Бетбелгі
             </Button>
+            {bookmarkMsg ? <span className="self-center text-sm text-neutral-500 dark:text-neutral-400">{bookmarkMsg}</span> : null}
           </div>
 
           {w.avgRating != null && (
-            <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200 flex items-center gap-6">
+            <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-200 flex items-center gap-6 dark:border-neutral-700 dark:bg-neutral-900">
               <ScoreRing score={w.avgRating} size={56} strokeWidth={4} />
               <div>
-                <div className="text-sm text-neutral-500">Орташа баға</div>
+                <div className="text-sm text-neutral-500 dark:text-neutral-400">Орташа баға</div>
                 <div className="text-2xl font-bold">{w.avgRating.toFixed(2)}</div>
               </div>
             </div>
@@ -172,12 +212,12 @@ export default function WorkDetailPage() {
               <CriteriaBar label="Әдістеме" score={w.reviews[0].methodology} />
               <CriteriaBar label="Ресімдеу" score={w.reviews[0].formatting} />
               <CriteriaBar label="Қорытынды" score={w.reviews[0].conclusion} />
-              <p className="text-sm text-neutral-600">{w.reviews[0].comment}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">{w.reviews[0].comment}</p>
             </div>
           )}
 
           {(session?.user?.role === "SUPERVISOR" || session?.user?.role === "ADMIN") && (
-            <div className="border border-neutral-200 rounded-xl p-6 bg-white">
+            <div className="border border-neutral-200 rounded-xl p-6 bg-white dark:border-neutral-700 dark:bg-neutral-900">
               <h3 className="text-lg font-semibold mb-4">Шолу жіберу</h3>
               <ReviewForm workId={id} onDone={() => window.location.reload()} />
             </div>

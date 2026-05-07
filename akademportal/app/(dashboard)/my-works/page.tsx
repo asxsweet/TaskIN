@@ -32,14 +32,14 @@ export default function MyWorksPage() {
   }, []);
 
   return (
-    <div className="space-y-6 -m-4 md:-m-8 px-4 md:px-8 py-6">
+    <div className="space-y-6 -m-4 md:-m-6 lg:-m-8 px-4 md:px-6 lg:px-8 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Менің жұмыстарым</h1>
         <Link href="/upload" className="text-primary text-sm font-medium hover:underline">
           Жүктеу
         </Link>
       </div>
-      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs">
+      <div className="bg-white rounded-lg border border-neutral-200 shadow-xs dark:border-neutral-700 dark:bg-neutral-900">
         <WorkTable rows={rows} />
       </div>
     </div>

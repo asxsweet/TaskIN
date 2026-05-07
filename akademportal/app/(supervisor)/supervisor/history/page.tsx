@@ -34,10 +34,10 @@ export default function SupervisorHistoryPage() {
         <EmptyState title="Тексеру тарихы жоқ" />
       : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-neutral-50 text-left">
+                <tr className="border-b bg-neutral-50 text-left dark:border-neutral-700 dark:bg-neutral-800">
                   <th className="p-3">Студент</th>
                   <th className="p-3">Тақырып</th>
                   <th className="p-3">Түрі</th>
@@ -48,7 +48,7 @@ export default function SupervisorHistoryPage() {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id} className="border-b border-neutral-100">
+                  <tr key={r.id} className="border-b border-neutral-100 dark:border-neutral-800">
                     <td className="p-3">{r.studentName}</td>
                     <td className="p-3 max-w-[200px] truncate">{r.title}</td>
                     <td className="p-3">{r.type}</td>
@@ -69,7 +69,7 @@ export default function SupervisorHistoryPage() {
         >
           Артқа
         </button>
-        <span className="text-sm text-neutral-500">
+        <span className="text-sm text-neutral-500 dark:text-neutral-400">
           Бет {page} · барлығы {total}
         </span>
         <button

@@ -21,6 +21,11 @@ model User {
   position     String?
   phone        String?
   employeeId   String?
+  bio          String?        @db.Text
+  socialLinks  String?        @db.Text
+  interests    String?        @db.Text
+  isLocked     Boolean        @default(false)
+  deletedAt    DateTime?
 
   approvalStatus ApprovalStatus @default(PENDING)
   approvalNote   String?
@@ -34,8 +39,10 @@ model User {
   reviews      Review[]
   reviewHelpful ReviewHelpful[]
   bookmarks    Bookmark[]
+  bookmarkFolders BookmarkFolder[]
   downloads    Download[]
   notifications Notification[]
+  auditLogs     AuditLog[]    @relation("AuditActor")
   createdAt    DateTime       @default(now())
 }
 
@@ -46,11 +53,14 @@ model Work {
   type             WorkType
   year             Int
   language         Language
-  filePath         String
+  fileName         String?
+  fileMimeType     String?
+  fileData         Bytes?
   fileSize         Int
   pageCount        Int?
   status           WorkStatus @default(PENDING)
   plagiarismScore  Float?
+  moderationFlag   Boolean    @default(false)
   authorId         String
   author           User       @relation("AuthorWorks", fields: [authorId], references: [id])
   supervisorId     String?
@@ -124,10 +134,23 @@ model Bookmark {
   id     String @id @default(cuid())
   userId String
   workId String
+  folderId String?
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   work   Work   @relation(fields: [workId], references: [id], onDelete: Cascade)
+  folder BookmarkFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
 
   @@unique([userId, workId])
+}
+
+model BookmarkFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks Bookmark[]
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name])
 }
 
 model Download {
@@ -164,6 +187,22 @@ model SiteSettings {
   socialLinks    String   @db.Text
   emailTemplates String?  @db.Text
   updatedAt      DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entity     String
+  entityId   String?
+  metadata   String?  @db.Text
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
 }
 
 enum Role {
