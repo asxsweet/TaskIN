@@ -1,0 +1,1016 @@
+================================================================================
+ҚОСЫМША. Task IN (akademportal) бағдарламалық кодының үзіндісі
+Қолданыс: мәтінді Word-ке көшіріңіз (Courier New немесе Consolas 9–10пт; межалар
+2 см). Бағдар: akademportal дерек каталогындағы нақты жолдар бойынша толық файлдар бар.
+Бет санын тәуелдік арттырып/azайту үшін бөлікті бөліп қалдырыңыз.
+================================================================================
+
+─── prisma/schema.prisma ───
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  password     String
+  role         Role           @default(STUDENT)
+  facultyId    String
+  faculty      Faculty        @relation(fields: [facultyId], references: [id])
+  departmentId String?
+  department   Department?    @relation(fields: [departmentId], references: [id])
+  avatar       String?
+  position     String?
+  phone        String?
+  employeeId   String?
+  bio          String?        @db.Text
+  socialLinks  String?        @db.Text
+  interests    String?        @db.Text
+  isLocked     Boolean        @default(false)
+  deletedAt    DateTime?
+
+  approvalStatus ApprovalStatus @default(PENDING)
+  approvalNote   String?
+  approvedById   String?        @map("approvedBy")
+  approver       User?          @relation("UserApprovalActor", fields: [approvedById], references: [id])
+  approvedUsers  User[]         @relation("UserApprovalActor")
+  approvedAt     DateTime?
+
+  works        Work[]         @relation("AuthorWorks")
+  supervised   Work[]         @relation("SupervisorWorks")
+  reviews      Review[]
+  reviewHelpful ReviewHelpful[]
+  bookmarks    Bookmark[]
+  bookmarkFolders BookmarkFolder[]
+  downloads    Download[]
+  notifications Notification[]
+  auditLogs     AuditLog[]    @relation("AuditActor")
+  createdAt    DateTime       @default(now())
+}
+
+model Work {
+  id               String     @id @default(cuid())
+  title            String
+  abstract         String     @db.Text
+  type             WorkType
+  year             Int
+  language         Language
+  fileName         String?
+  fileMimeType     String?
+  fileData         Bytes?
+  fileSize         Int
+  pageCount        Int?
+  status           WorkStatus @default(PENDING)
+  plagiarismScore  Float?
+  moderationFlag   Boolean    @default(false)
+  authorId         String
+  author           User       @relation("AuthorWorks", fields: [authorId], references: [id])
+  supervisorId     String?
+  supervisor       User?      @relation("SupervisorWorks", fields: [supervisorId], references: [id])
+  departmentId     String
+  department       Department @relation(fields: [departmentId], references: [id])
+  keywords         Keyword[]
+  reviews          Review[]
+  downloads        Download[]
+  bookmarks        Bookmark[]
+  viewCount        Int        @default(0)
+  deletedAt        DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  workId       String
+  work         Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  reviewerId   String
+  reviewer     User     @relation(fields: [reviewerId], references: [id])
+  relevance    Float
+  methodology  Float
+  formatting   Float
+  conclusion   Float
+  overallScore Float
+  strengths    String   @db.Text
+  suggestions  String   @db.Text
+  comment      String   @db.Text
+  decision     Decision
+  returnReason String?
+  helpfulCount Int      @default(0)
+  helpfulMarks ReviewHelpful[]
+  createdAt    DateTime @default(now())
+}
+
+model ReviewHelpful {
+  id        String @id @default(cuid())
+  userId    String
+  reviewId  String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+}
+
+model Faculty {
+  id           String       @id @default(cuid())
+  name         String
+  departments  Department[]
+  users        User[]
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  facultyId String
+  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  works     Work[]
+  users     User[]
+}
+
+model Keyword {
+  id    String @id @default(cuid())
+  name  String
+  works Work[]
+}
+
+model Bookmark {
+  id     String @id @default(cuid())
+  userId String
+  workId String
+  folderId String?
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work   Work   @relation(fields: [workId], references: [id], onDelete: Cascade)
+  folder BookmarkFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, workId])
+}
+
+model BookmarkFolder {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks Bookmark[]
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String
+  workId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work      Work     @relation(fields: [workId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?  @db.Text
+  link      String?
+  read      Boolean  @default(false)
+  metadata  String?  @db.Text
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id             String   @id
+  siteName       String   @default("Task IN")
+  tagline        String?  @db.Text
+  logoUrl        String?
+  emailFrom      String?  @default("noreply@taskin.kz")
+  contactEmail   String
+  contactPhone   String
+  contactAddress String   @db.Text
+  socialLinks    String   @db.Text
+  emailTemplates String?  @db.Text
+  updatedAt      DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entity     String
+  entityId   String?
+  metadata   String?  @db.Text
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
+}
+
+enum Role {
+  STUDENT
+  SUPERVISOR
+  ADMIN
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum WorkType {
+  DIPLOMA
+  COURSE
+  ARTICLE
+  ESSAY
+  PROJECT
+}
+
+enum Language {
+  KAZAKH
+  RUSSIAN
+  ENGLISH
+}
+
+enum WorkStatus {
+  PENDING
+  APPROVED
+  RETURNED
+  REJECTED
+}
+
+enum Decision {
+  APPROVE
+  RETURN
+  REJECT
+}
+
+
+─── lib/auth.ts ───
+
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+import { A, R } from "@/lib/prisma-enums";
+
+export const authOptions: NextAuthOptions = {
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
+  pages: { signIn: "/auth" },
+  providers: [
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email.toLowerCase() },
+        });
+        if (!user) return null;
+        if (user.deletedAt || user.isLocked) return null;
+        const ok = await bcrypt.compare(credentials.password, user.password);
+        if (!ok) return null;
+        if (user.role === R.SUPERVISOR) {
+          if (user.approvalStatus === A.PENDING) {
+            throw new Error("Өтініміңіз әлі қаралмады");
+          }
+          if (user.approvalStatus === A.REJECTED) {
+            throw new Error(`Өтініміңіз қабылданбады: ${user.approvalNote || ""}`.trim());
+          }
+        }
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          approvalStatus: user.approvalStatus,
+          approvalNote: user.approvalNote,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as { id: string }).id;
+        token.role = (user as { role: string }).role;
+        token.approvalStatus = (user as { approvalStatus?: string }).approvalStatus;
+        token.approvalNote = (user as { approvalNote?: string | null }).approvalNote;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.approvalStatus = token.approvalStatus as string | undefined;
+        session.user.approvalNote = token.approvalNote as string | null | undefined;
+      }
+      return session;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+
+─── lib/api-user.ts ───
+
+import { getServerSession } from "next-auth";
+import type { NextRequest } from "next/server";
+import type { User } from "@prisma/client";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { verifyAccessToken } from "@/lib/jwt";
+
+export async function getUserFromRequest(req: NextRequest): Promise<User | null> {
+  const auth = req.headers.get("authorization");
+  if (auth?.startsWith("Bearer ")) {
+    const token = auth.slice(7);
+    try {
+      const payload = verifyAccessToken(token);
+      const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+      if (!user || user.deletedAt || user.isLocked) return null;
+      return user;
+    } catch {
+      return null;
+    }
+  }
+
+  const session = await getServerSession(authOptions);
+  const id = session?.user?.id;
+  if (!id) return null;
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user || user.deletedAt || user.isLocked) return null;
+  return user;
+}
+
+export async function requireUser(req: NextRequest): Promise<User> {
+  const user = await getUserFromRequest(req);
+  if (!user) {
+    const err = new Error("UNAUTHORIZED") as Error & { status: number };
+    err.status = 401;
+    throw err;
+  }
+  return user;
+}
+
+export async function requireAdmin(req: NextRequest): Promise<User> {
+  const user = await requireUser(req);
+  if (user.role !== "ADMIN") {
+    const err = new Error("FORBIDDEN") as Error & { status: number };
+    err.status = 403;
+    throw err;
+  }
+  return user;
+}
+
+export async function requireStudent(req: NextRequest): Promise<User> {
+  const user = await requireUser(req);
+  if (user.role !== "STUDENT") {
+    const err = new Error("FORBIDDEN") as Error & { status: number };
+    err.status = 403;
+    throw err;
+  }
+  return user;
+}
+
+/** Жетекші немесе әкімші (тексеру API). */
+export async function requireSupervisorOrAdmin(req: NextRequest): Promise<User> {
+  const user = await requireUser(req);
+  if (user.role !== "SUPERVISOR" && user.role !== "ADMIN") {
+    const err = new Error("FORBIDDEN") as Error & { status: number };
+    err.status = 403;
+    throw err;
+  }
+  return user;
+}
+
+
+─── middleware.ts ───
+
+import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { hitRateLimit } from "@/lib/rate-limit";
+import { isStateChanging } from "@/lib/security";
+
+const ROLE_HOME: Record<string, string> = {
+  STUDENT: "/dashboard",
+  SUPERVISOR: "/supervisor",
+  ADMIN: "/admin",
+};
+
+function starts(pathname: string, base: string) {
+  return pathname === base || pathname.startsWith(`${base}/`);
+}
+
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const secret = process.env.NEXTAUTH_SECRET;
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (starts(pathname, "/api")) {
+    const baseKey = `${ip}:${pathname}:${req.method}`;
+    const strict =
+      starts(pathname, "/api/auth/login") ||
+      starts(pathname, "/api/auth/register") ||
+      starts(pathname, "/api/works");
+    const limit = hitRateLimit(baseKey, {
+      max: strict ? 20 : 120,
+      windowMs: 60_000,
+    });
+    if (limit.limited) {
+      return NextResponse.json(
+        { error: "Too many requests. Қайтадан сәл кейінірек көріңіз." },
+        { status: 429 }
+      );
+    }
+  }
+
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    /\.(?:ico|png|jpg|jpeg|svg|gif|webp|woff2?)$/.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  /** Must match how the session cookie was named for this request (http vs https), not only NEXTAUTH_URL. */
+  const secureCookie = req.nextUrl.protocol === "https:";
+  const token = await getToken({ req, secret, secureCookie });
+  const role = (token?.role as string | undefined) ?? undefined;
+
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/auth")) {
+    if (role) {
+      const home = ROLE_HOME[role] ?? "/dashboard";
+      return NextResponse.redirect(new URL(home, req.url));
+    }
+    return NextResponse.next();
+  }
+
+  const isPublicApi =
+    starts(pathname, "/api/auth") ||
+    starts(pathname, "/api/public") ||
+    pathname === "/api/site";
+
+  if (isPublicApi) {
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api") && isStateChanging(req.method)) {
+    const origin = req.headers.get("origin");
+    const host = req.headers.get("host");
+    if (origin && host) {
+      const expected = `${req.nextUrl.protocol}//${host}`;
+      if (origin !== expected) {
+        return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
+      }
+    }
+  }
+
+  if (!role) {
+    if (starts(pathname, "/api")) {
+      return NextResponse.json({ error: "Кіру қажет" }, { status: 401 });
+    }
+    const signIn = new URL("/auth", req.url);
+    signIn.searchParams.set("callbackUrl", pathname + req.nextUrl.search);
+    return NextResponse.redirect(signIn);
+  }
+
+  const home = ROLE_HOME[role] ?? "/dashboard";
+
+  if (role === "SUPERVISOR" && pathname === "/settings") {
+    return NextResponse.redirect(new URL("/supervisor/settings", req.url));
+  }
+  if (role === "ADMIN" && pathname === "/settings") {
+    return NextResponse.redirect(new URL("/admin/settings", req.url));
+  }
+  if (pathname === "/profile") {
+    if (role === "SUPERVISOR") {
+      return NextResponse.redirect(new URL("/supervisor/profile", req.url));
+    }
+    if (role === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+  }
+
+  if (starts(pathname, "/api/admin")) {
+    if (role !== "ADMIN") {
+      return NextResponse.json({ error: "Рұқсат жоқ" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api/supervisor")) {
+    if (role !== "SUPERVISOR" && role !== "ADMIN") {
+      return NextResponse.json({ error: "Рұқсат жоқ" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api/student")) {
+    if (role !== "STUDENT") {
+      return NextResponse.json({ error: "Рұқсат жоқ" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api/stats")) {
+    if (role !== "ADMIN") {
+      return NextResponse.json({ error: "Рұқсат жоқ" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
+  const studentPaths = [
+    "/dashboard",
+    "/profile",
+    "/search",
+    "/works",
+    "/upload",
+    "/my-works",
+    "/bookmarks",
+    "/settings",
+    "/notifications",
+  ];
+  const isStudentPage = studentPaths.some((p) => starts(pathname, p));
+
+  if (isStudentPage) {
+    if (role !== "STUDENT") {
+      return NextResponse.redirect(new URL(home, req.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/supervisor")) {
+    if (role !== "SUPERVISOR" && role !== "ADMIN") {
+      return NextResponse.redirect(new URL(home, req.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/admin")) {
+    if (role !== "ADMIN") {
+      return NextResponse.redirect(new URL(home, req.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (starts(pathname, "/api")) {
+    return NextResponse.next();
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image).*)"],
+};
+
+
+─── lib/validations.ts ───
+
+import { z } from "zod";
+
+/** Select "" → undefined; Prisma id (cuid/nanoid т.б.) үшін cuid() емес, ұзындық тексеруі */
+const optionalId = z.preprocess(
+  (v) => (v === "" || v === null ? undefined : v),
+  z.string().min(1).max(128).optional()
+);
+
+const roleEnum = z.enum(["STUDENT", "SUPERVISOR", "ADMIN"]);
+const workTypeEnum = z.enum(["DIPLOMA", "COURSE", "ARTICLE", "ESSAY", "PROJECT"]);
+const languageEnum = z.enum(["KAZAKH", "RUSSIAN", "ENGLISH"]);
+const workStatusEnum = z.enum(["PENDING", "APPROVED", "RETURNED", "REJECTED"]);
+const decisionEnum = z.enum(["APPROVE", "RETURN", "REJECT"]);
+
+export const registerSchema = z
+  .object({
+    name: z.string().trim().min(2).max(120),
+    email: z.string().trim().toLowerCase().email({ message: "Жарамды email енгізіңіз" }),
+    password: z.string().min(8).max(128),
+    role: z.enum(["STUDENT", "SUPERVISOR"]).default("STUDENT"),
+    facultyId: optionalId,
+    departmentId: optionalId,
+    position: z.string().trim().max(200).optional(),
+    phone: z.string().trim().max(32).optional(),
+    employeeId: z.string().trim().max(64).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.role === "SUPERVISOR") {
+      if (!data.departmentId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Кафедраны таңдаңыз",
+          path: ["departmentId"],
+        });
+      }
+      if (!data.position?.trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Қызметін енгізіңіз", path: ["position"] });
+      }
+      if (!data.phone?.trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Телефонды енгізіңіз", path: ["phone"] });
+      }
+      if (!data.employeeId?.trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Куәлік нөмірін енгізіңіз", path: ["employeeId"] });
+      }
+    } else if (!data.facultyId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Факультетті таңдаңыз",
+        path: ["facultyId"],
+      });
+    }
+  });
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const workCreateSchema = z.object({
+  title: z.string().min(3).max(500),
+  abstract: z.string().min(20),
+  type: workTypeEnum,
+  year: z.number().int().min(1990).max(2100),
+  language: languageEnum,
+  /** Prisma id (cuid т.б.) — тек қатаң cuid() форматы әрдайым сәйкес келмей қалады */
+  departmentId: z.string().min(1, "Кафедраны таңдаңыз").max(128),
+  supervisorId: optionalId,
+  keywordNames: z.array(z.string().min(1).max(64)).max(20).optional(),
+});
+
+export const workUpdateSchema = workCreateSchema.partial().extend({
+  status: workStatusEnum.optional(),
+});
+
+export const reviewCreateSchema = z
+  .object({
+    relevance: z.number().min(1).max(5),
+    methodology: z.number().min(1).max(5),
+    formatting: z.number().min(1).max(5),
+    conclusion: z.number().min(1).max(5),
+    strengths: z.string().min(10),
+    suggestions: z.string().min(10),
+    comment: z.string().min(1),
+    decision: decisionEnum,
+    returnReason: z.string().optional().nullable(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.decision === "RETURN" || data.decision === "REJECT") {
+      if (!data.returnReason?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Себебін жазыңыз",
+          path: ["returnReason"],
+        });
+      }
+    }
+  });
+
+export const userUpdateSchema = z.object({
+  name: z.string().min(2).max(120).optional(),
+  avatar: z
+    .string()
+    .max(2_000_000)
+    .refine(
+      (v) =>
+        v.startsWith("http://") ||
+        v.startsWith("https://") ||
+        v.startsWith("data:image/"),
+      "Аватар URL немесе сурет (data:image) болуы керек"
+    )
+    .optional()
+    .nullable(),
+  facultyId: optionalId,
+  departmentId: optionalId,
+  employeeId: z.string().trim().max(64).optional().nullable(),
+  phone: z.string().trim().max(32).optional().nullable(),
+  position: z.string().trim().max(200).optional().nullable(),
+  bio: z.string().trim().max(2000).optional().nullable(),
+  socialLinks: z.string().trim().max(4000).optional().nullable(),
+  interests: z.string().trim().max(2000).optional().nullable(),
+});
+
+
+─── app/api/search/route.ts ───
+
+import { NextRequest, NextResponse } from "next/server";
+import { requireUser } from "@/lib/api-user";
+import { searchWorks } from "@/lib/elasticsearch";
+
+export async function GET(req: NextRequest) {
+  try {
+    await requireUser(req);
+    const { searchParams } = new URL(req.url);
+    const q = searchParams.get("q") || undefined;
+    const rawType = searchParams.get("type") || undefined;
+    const types = rawType?.includes(",") ? rawType.split(",").filter(Boolean) : undefined;
+    const singleType = rawType && !rawType.includes(",") ? rawType : undefined;
+    const rawFaculty = searchParams.get("faculty") || undefined;
+    const faculties = rawFaculty?.includes(",") ? rawFaculty.split(",").filter(Boolean) : undefined;
+    const singleFaculty = rawFaculty && !rawFaculty.includes(",") ? rawFaculty : undefined;
+    const year = searchParams.get("year");
+    const yearFrom = searchParams.get("yearFrom");
+    const yearTo = searchParams.get("yearTo");
+    const lang = searchParams.get("lang") || undefined;
+    const departmentId = searchParams.get("departmentId") || undefined;
+    const supervisorId = searchParams.get("supervisorId") || undefined;
+    const status = searchParams.get("status") || undefined;
+    const sort = searchParams.get("sort") || undefined;
+    const page = Number(searchParams.get("page") || 1);
+    const pageSize = Number(searchParams.get("pageSize") || 12);
+
+    const result = await searchWorks({
+      q,
+      type: singleType,
+      types,
+      facultyId: singleFaculty,
+      facultyIds: faculties,
+      year: year ? Number(year) : undefined,
+      yearFrom: yearFrom ? Number(yearFrom) : undefined,
+      yearTo: yearTo ? Number(yearTo) : undefined,
+      lang,
+      departmentId,
+      supervisorId,
+      status,
+      sort,
+      page,
+      pageSize,
+    });
+
+    return NextResponse.json(result);
+  } catch (e) {
+    const err = e as Error & { status?: number };
+    if (err.status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (err.status === 403) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    console.error("[api/search]", e);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+
+─── app/api/works/route.ts ───
+
+import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/api-user";
+import { workCreateSchema } from "@/lib/validations";
+import { checkPlagiarism } from "@/lib/ithenticate";
+import { indexWork } from "@/lib/elasticsearch";
+import { notifySupervisorAssigned } from "@/lib/email";
+import { Prisma } from "@prisma/client";
+import { sanitizeText } from "@/lib/security";
+
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const ALLOWED_MIME = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+function hasPdfSignature(buf: Buffer) {
+  return buf.length >= 5 && buf.subarray(0, 5).toString("utf8") === "%PDF-";
+}
+
+function hasZipSignature(buf: Buffer) {
+  return (
+    buf.length >= 4 &&
+    buf[0] === 0x50 &&
+    buf[1] === 0x4b &&
+    buf[2] === 0x03 &&
+    buf[3] === 0x04
+  );
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const user = await requireUser(req);
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, Number(searchParams.get("page") || 1));
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") || 20)));
+    const type = searchParams.get("type") || undefined;
+    const dept = searchParams.get("departmentId") || undefined;
+    const year = searchParams.get("year");
+    const lang = searchParams.get("lang") || undefined;
+    const status = searchParams.get("status") || undefined;
+    const search = searchParams.get("search") || undefined;
+    const sort = searchParams.get("sort") || "createdAt";
+    const order = searchParams.get("order") === "asc" ? "asc" : "desc";
+    const authorId = searchParams.get("authorId");
+    const supervisorId = searchParams.get("supervisorId");
+
+    const where: Prisma.WorkWhereInput = { deletedAt: null };
+    if (user.role !== "ADMIN") {
+      if (status === "PENDING" && user.role === "SUPERVISOR") {
+        where.supervisorId = user.id;
+      }
+    }
+    if (type) where.type = type as never;
+    if (dept) where.departmentId = dept;
+    if (year) where.year = Number(year);
+    if (lang) where.language = lang as never;
+    if (status) where.status = status as never;
+    if (authorId === "me") where.authorId = user.id;
+    else if (authorId) where.authorId = authorId;
+    if (supervisorId) where.supervisorId = supervisorId;
+
+    if (search?.trim()) {
+      const q = search.trim();
+      where.OR = [
+        { title: { contains: q, mode: "insensitive" } },
+        { abstract: { contains: q, mode: "insensitive" } },
+      ];
+    }
+
+    let orderBy: Prisma.WorkOrderByWithRelationInput = { createdAt: order };
+    if (sort === "year") orderBy = { year: order };
+    if (sort === "views") orderBy = { viewCount: order };
+    if (sort === "title") orderBy = { title: order };
+
+    const [total, works] = await prisma.$transaction([
+      prisma.work.count({ where }),
+      prisma.work.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          keywords: true,
+          author: true,
+          department: { include: { faculty: true } },
+          supervisor: true,
+          downloads: true,
+          reviews: true,
+        },
+      }),
+    ]);
+
+    const items = works.map((w) => {
+      const avg =
+        w.reviews.length > 0 ?
+          w.reviews.reduce((s, r) => s + r.overallScore, 0) / w.reviews.length
+        : null;
+      return {
+        id: w.id,
+        title: w.title,
+        abstract: w.abstract,
+        type: w.type,
+        year: w.year,
+        language: w.language,
+        status: w.status,
+        viewCount: w.viewCount,
+        fileSize: w.fileSize,
+        pageCount: w.pageCount,
+        plagiarismScore: w.plagiarismScore,
+        createdAt: w.createdAt.toISOString(),
+        author: { id: w.author.id, name: w.author.name, avatar: w.author.avatar },
+        faculty: { id: w.department.faculty.id, name: w.department.faculty.name },
+        department: { id: w.department.id, name: w.department.name },
+        supervisor: w.supervisor ? { id: w.supervisor.id, name: w.supervisor.name } : null,
+        keywords: w.keywords.map((k) => ({ id: k.id, name: k.name })),
+        avgRating: avg,
+        downloadCount: w.downloads.length,
+      };
+    });
+
+    return NextResponse.json({ total, page, limit, items });
+  } catch (e) {
+    const err = e as Error & { status?: number };
+    if (err.status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const user = await requireUser(req);
+    const form = await req.formData();
+    const file = form.get("file");
+    if (!(file instanceof Blob)) {
+      return NextResponse.json({ error: "file required" }, { status: 400 });
+    }
+    const metaRaw = form.get("metadata");
+    if (typeof metaRaw !== "string") {
+      return NextResponse.json({ error: "metadata required" }, { status: 400 });
+    }
+    const meta = workCreateSchema.parse(JSON.parse(metaRaw));
+    const buf = Buffer.from(await file.arrayBuffer());
+    const mime = file.type || "application/octet-stream";
+    const originalName = (file as File).name || "upload.bin";
+    const size = buf.length;
+    const ext = originalName.toLowerCase().split(".").pop() || "";
+
+    if (size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: "Файл өлшемі 25MB-тан аспауы керек" },
+        { status: 400 }
+      );
+    }
+    if (!ALLOWED_MIME.has(mime)) {
+      return NextResponse.json(
+        { error: "Тек PDF немесе DOCX файлдарын жүктеуге болады" },
+        { status: 400 }
+      );
+    }
+    if (ext !== "pdf" && ext !== "docx") {
+      return NextResponse.json(
+        { error: "Файл кеңейтімі PDF немесе DOCX болуы керек" },
+        { status: 400 }
+      );
+    }
+    if (ext === "pdf" && !hasPdfSignature(buf)) {
+      return NextResponse.json({ error: "PDF файл құрылымы қате" }, { status: 400 });
+    }
+    if (ext === "docx" && !hasZipSignature(buf)) {
+      return NextResponse.json({ error: "DOCX файл құрылымы қате" }, { status: 400 });
+    }
+
+    let pageCount: number | null = null;
+    if (originalName.toLowerCase().endsWith(".pdf")) {
+      try {
+        const mod = await import("pdf-parse");
+        const pdfParse = (mod as { default?: (b: Buffer) => Promise<{ numpages: number }> }).default ?? (mod as unknown as (b: Buffer) => Promise<{ numpages: number }>);
+        const parsed = await pdfParse(buf);
+        pageCount = parsed.numpages || null;
+      } catch {
+        pageCount = null;
+      }
+    }
+
+    const plagiarismScore = await checkPlagiarism(buf, originalName);
+
+    const keywordNames = meta.keywordNames ?? [];
+    const keywords = await Promise.all(
+      keywordNames.map(async (name) => {
+        const existing = await prisma.keyword.findFirst({
+          where: { name: { equals: name, mode: "insensitive" } },
+        });
+        if (existing) return { id: existing.id };
+        return prisma.keyword.create({ data: { name } });
+      })
+    );
+
+    const work = await prisma.work.create({
+      data: {
+        title: sanitizeText(meta.title),
+        abstract: sanitizeText(meta.abstract),
+        type: meta.type,
+        year: meta.year,
+        language: meta.language,
+        fileName: originalName,
+        fileMimeType: mime,
+        fileData: buf,
+        fileSize: size,
+        pageCount,
+        plagiarismScore,
+        authorId: user.id,
+        supervisorId: meta.supervisorId ?? undefined,
+        departmentId: meta.departmentId,
+        status: "PENDING",
+        keywords: { connect: keywords.map((k) => ({ id: k.id })) },
+      },
+      include: { supervisor: true },
+    });
+
+    if (work.supervisor?.email) {
+      await notifySupervisorAssigned(work.supervisor.email, work.title);
+    }
+
+    await indexWork(work.id).catch(() => undefined);
+
+    return NextResponse.json({
+      id: work.id,
+      title: work.title,
+      fileSize: work.fileSize,
+      pageCount: work.pageCount,
+      plagiarismScore: work.plagiarismScore,
+    });
+  } catch (e) {
+    const err = e as Error & { status?: number };
+    if (err.status === 401) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (e instanceof ZodError) {
+      const first = e.issues[0];
+      const message = first?.message || "Деректер дұрыс емес";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    const message = e instanceof Error ? e.message : "Invalid request";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}

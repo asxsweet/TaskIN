@@ -26,7 +26,12 @@ export async function GET(req: NextRequest, ctx: Ctx) {
       },
     });
     if (!work) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    if (user.role === "SUPERVISOR" && work.supervisorId && work.supervisorId !== user.id) {
+    if (
+      user.role === "SUPERVISOR" &&
+      work.status !== "APPROVED" &&
+      work.supervisorId &&
+      work.supervisorId !== user.id
+    ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     if (work.status !== "APPROVED" && user.role === "STUDENT" && work.authorId !== user.id) {

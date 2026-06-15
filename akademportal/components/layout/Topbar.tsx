@@ -7,14 +7,19 @@ import { Input } from "@/components/ui/Input";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-export function Topbar() {
+type TopbarProps = {
+  /** Толық іздеу бетінің жолы (студент: /search, жетекші: /supervisor/search) */
+  searchBasePath?: string;
+};
+
+export function Topbar({ searchBasePath = "/search" }: TopbarProps) {
   const router = useRouter();
   const [q, setQ] = useState("");
 
   const goSearch = useCallback(() => {
     const t = q.trim();
-    router.push(t ? `/search?q=${encodeURIComponent(t)}` : "/search");
-  }, [q, router]);
+    router.push(t ? `${searchBasePath}?q=${encodeURIComponent(t)}` : searchBasePath);
+  }, [q, router, searchBasePath]);
 
   return (
     <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-6 lg:px-8 sticky top-0 z-40 dark:border-neutral-800 dark:bg-neutral-900">

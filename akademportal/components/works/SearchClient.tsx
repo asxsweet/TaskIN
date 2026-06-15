@@ -39,7 +39,15 @@ const SEARCH_DEBOUNCE_MS = 450;
 const YEAR_DEBOUNCE_MS = 500;
 const URL_SYNC_DEBOUNCE_MS = 550;
 
-export default function SearchPage() {
+type SearchClientProps = {
+  basePath?: string;
+  workHrefPrefix?: string;
+};
+
+export default function SearchClient({
+  basePath = "/search",
+  workHrefPrefix = "/works",
+}: SearchClientProps) {
   const router = useRouter();
   const params = useSearchParams();
   const [q, setQ] = useState(params.get("q") || "");
@@ -119,13 +127,15 @@ export default function SearchPage() {
       p.set("page", String(page));
       if (typeKey) p.set("type", typeKey);
       if (facultyKey) p.set("faculty", facultyKey);
-      const next = `/search?${p.toString()}`;
+      const qs = p.toString();
+      const next = qs ? `${basePath}?${qs}` : basePath;
       if (typeof window !== "undefined" && `${window.location.pathname}${window.location.search}` !== next) {
         router.replace(next, { scroll: false });
       }
     }, URL_SYNC_DEBOUNCE_MS);
     return () => window.clearTimeout(t);
   }, [
+    basePath,
     effectiveQ,
     sort,
     lang,
@@ -389,6 +399,7 @@ export default function SearchPage() {
                 downloads={w.downloads}
                 year={w.year}
                 tags={w.keywords}
+                viewHref={`${workHrefPrefix}/${w.id}`}
               />
             ))}
           </div>

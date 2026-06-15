@@ -13,18 +13,22 @@ import {
   History,
   Settings,
   LogOut,
+  Search,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { Topbar } from "@/components/layout/Topbar";
+import { SupervisorMobileNav } from "@/components/layout/SupervisorMobileNav";
 import { apiJsonSafe } from "@/lib/fetcher";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const MAIN = [
   { href: "/supervisor", label: "Басқару тақтасы", icon: LayoutDashboard },
   { href: "/supervisor/assigned", label: "Тексеру кезегі", icon: ClipboardList, badge: "assigned" as const },
+  { href: "/supervisor/search", label: "Іздеу", icon: Search },
   { href: "/supervisor/notifications", label: "Хабарландырулар", icon: Bell },
 ];
 
@@ -40,6 +44,8 @@ function supervisorSectionTitle(pathname: string | null) {
   if (p.startsWith("/supervisor/students")) return "Студенттерім";
   if (p.startsWith("/supervisor/history")) return "Тексеру тарихы";
   if (p.startsWith("/supervisor/notifications")) return "Хабарландырулар";
+  if (p.startsWith("/supervisor/search")) return "Іздеу";
+  if (p.startsWith("/supervisor/works")) return "Жұмыс";
   if (p.startsWith("/supervisor/assigned")) return "Тексеру кезегі";
   if (p === "/supervisor" || p === "/supervisor/") return "Басқару тақтасы";
   if (p.startsWith("/supervisor/")) return "Басқару";
@@ -61,13 +67,15 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
   const supervisorTitle = useMemo(() => supervisorSectionTitle(pathname), [pathname]);
 
   const fullBleed = pathname?.includes("/supervisor/review/");
+  const useSearchLayout =
+    pathname?.startsWith("/supervisor/search") || pathname?.startsWith("/supervisor/works/");
 
   if (fullBleed) {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 dark:bg-neutral-950">
+    <div className="flex min-h-screen bg-neutral-50 pb-20 md:pb-0 dark:bg-neutral-950">
       <aside className="hidden md:flex w-[260px] border-r border-neutral-200 bg-white flex-col h-screen sticky top-0 dark:border-neutral-800 dark:bg-neutral-900">
         <div className="p-6">
           <Logo href="/" />
@@ -175,19 +183,23 @@ export function SupervisorShell({ children }: { children: ReactNode }) {
         </nav>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-6 lg:px-8 sticky top-0 z-40 dark:border-neutral-800 dark:bg-neutral-900">
-          <div className="text-sm text-neutral-500 min-w-0 truncate pr-4">
-            <span className="text-neutral-500 dark:text-neutral-400">Жетекші панелі</span>{" "}
-            <span className="text-neutral-300 dark:text-neutral-600">/</span>{" "}
-            <span className="text-neutral-900 font-medium dark:text-neutral-100">{supervisorTitle}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <NotificationBell variant="compact" />
-          </div>
-        </header>
+        {useSearchLayout ?
+          <Topbar searchBasePath="/supervisor/search" />
+        : <header className="h-14 border-b border-neutral-200 bg-white flex items-center justify-between px-4 md:px-6 lg:px-8 sticky top-0 z-40 dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="text-sm text-neutral-500 min-w-0 truncate pr-4">
+              <span className="text-neutral-500 dark:text-neutral-400">Жетекші панелі</span>{" "}
+              <span className="text-neutral-300 dark:text-neutral-600">/</span>{" "}
+              <span className="text-neutral-900 font-medium dark:text-neutral-100">{supervisorTitle}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <NotificationBell variant="compact" />
+            </div>
+          </header>
+        }
         <main className="p-4 md:p-6 lg:p-8 flex-1 min-w-0">{children}</main>
       </div>
+      {useSearchLayout ? <SupervisorMobileNav /> : null}
     </div>
   );
 }

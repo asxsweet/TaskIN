@@ -26,6 +26,7 @@ export type WorkCardData = {
   tags: string[];
   plagiarismScore?: number | null;
   variant?: "horizontal" | "vertical" | "compact";
+  viewHref?: string;
 };
 
 export function WorkCard({
@@ -43,6 +44,7 @@ export function WorkCard({
   tags,
   plagiarismScore,
   variant = "vertical",
+  viewHref,
 }: WorkCardData) {
   const isCompact = variant === "compact";
   const isHorizontal = variant === "horizontal";
@@ -66,7 +68,7 @@ export function WorkCard({
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="type">{workTypeLabel(type)}</Badge>
           {status && <Badge variant={statusVariant}>{workStatusLabel(status)}</Badge>}
-          <PlagiarismBadge score={plagiarismScore ?? null} />
+          {plagiarismScore !== undefined && <PlagiarismBadge score={plagiarismScore} />}
         </div>
 
         <h3
@@ -132,7 +134,7 @@ export function WorkCard({
               <Button variant="secondary" size="sm" type="button">
                 <FileText size={14} className="mr-1.5" /> PDF
               </Button>
-              <Link href={`/works/${id}`}>
+              <Link href={viewHref ?? `/works/${id}`}>
                 <Button variant="ghost" size="sm" type="button">
                   Қарау →
                 </Button>
